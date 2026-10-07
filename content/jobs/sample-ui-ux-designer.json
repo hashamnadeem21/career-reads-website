@@ -1,0 +1,24 @@
+{
+  "title": "UI/UX Designer",
+  "company": "Example Creative Studio",
+  "city": "Karachi",
+  "workModel": "on-site",
+  "employmentType": "full-time",
+  "category": "design-creative",
+  "experience": "entry",
+  "summary": "Design clean, simple screens for mobile and web apps, from wireframes to final handoff.",
+  "responsibilities": [
+    "Create wireframes and prototypes in Figma",
+    "Run small user tests",
+    "Prepare design handoff for developers"
+  ],
+  "requirements": [
+    "A portfolio of app or web designs",
+    "Working knowledge of Figma"
+  ],
+  "postedAt": "2026-09-30",
+  "country": "Pakistan",
+  "status": "published",
+  "sample": true,
+  "applyEmail": "jobs@example.com"
+}

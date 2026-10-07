@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" role="img" aria-label="Abstract travel illustration for the section &quot;Bringing slow travel home&quot;">
+  <defs>
+    <linearGradient id="bg" gradientTransform="rotate(29)">
+      <stop offset="0" stop-color="#431407"/>
+      <stop offset="1" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F59E0B"/>
+      <stop offset="1" stop-color="#F43F5E"/>
+    </linearGradient>
+    <radialGradient id="glow0"><stop offset="0" stop-color="#F59E0B" stop-opacity=".75"/><stop offset="1" stop-color="#F59E0B" stop-opacity="0"/></radialGradient>
+    <radialGradient id="glow1"><stop offset="0" stop-color="#F43F5E" stop-opacity=".65"/><stop offset="1" stop-color="#F43F5E" stop-opacity="0"/></radialGradient>
+    <pattern id="dots" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.6" fill="#fff" fill-opacity=".09"/></pattern>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="521.4" cy="412.2" r="432" fill="url(#glow0)"/>
+  <circle cx="760.9" cy="187.8" r="429.2" fill="url(#glow1)"/>
+  <circle cx="392.6" cy="363.6" r="393.4" fill="url(#glow0)"/>
+  <rect width="1600" height="900" fill="url(#dots)"/>
+  <circle cx="1250" cy="230" r="90" fill="#FCD34D" fill-opacity=".9"/>
+  <path d="M0 620L0 385.4L200 530.2L400 384.1L600 558.6L800 420.1L1000 442.5L1200 301.7L1400 557.8L1600 482L1600 620V900H0Z" fill="#F59E0B" fill-opacity="0.45"/>
+  <path d="M0 710L0 489.7L200 470.9L400 582.1L600 462.2L800 469.9L1000 583.1L1200 634.2L1400 499.8L1600 505.1L1600 710V900H0Z" fill="#F43F5E" fill-opacity="0.7"/>
+  <path d="M0 800L0 715.3L200 625.7L400 653.8L600 707.2L800 692.4L1000 652L1200 620.4L1400 635.9L1600 646.5L1600 800V900H0Z" fill="#0F172A" fill-opacity="0.95"/>
+  <path d="M260 900C420 760 520 820 700 700S1000 640 1120 560" stroke="#fff" stroke-width="6" stroke-dasharray="18 18" fill="none" stroke-opacity=".8"/>
+</svg>

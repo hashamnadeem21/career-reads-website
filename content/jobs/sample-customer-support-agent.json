@@ -1,0 +1,28 @@
+{
+  "title": "Customer Support Agent (Night Shift)",
+  "company": "Example Support Center",
+  "city": "Lahore",
+  "workModel": "on-site",
+  "employmentType": "full-time",
+  "category": "customer-support",
+  "experience": "entry",
+  "salary": "PKR 55,000 – 70,000 / month",
+  "summary": "Help international customers over chat and email on a US-time night shift.",
+  "responsibilities": [
+    "Answer customer chats and emails",
+    "Log issues in the help desk"
+  ],
+  "requirements": [
+    "Fluent spoken and written English",
+    "Willing to work night shifts"
+  ],
+  "benefits": [
+    "Pick and drop",
+    "Night-shift allowance"
+  ],
+  "postedAt": "2026-09-26",
+  "country": "Pakistan",
+  "status": "published",
+  "sample": true,
+  "applyEmail": "jobs@example.com"
+}

@@ -1,9 +1,9 @@
 {
   "slug": "editorial-team",
-  "name": "BlogNest Editorial Team",
+  "name": "Career Reads Editorial Team",
   "type": "Organization",
   "role": "Editors and staff writers",
-  "bio": "The BlogNest editorial team researches, writes, and edits our guides on technology, AI tools, productivity, travel, lifestyle, and personal development. Every article is reviewed against our editorial policy before publication and updated when facts change.",
+  "bio": "The Career Reads editorial team researches, writes, and edits our guides on technology, AI tools, productivity, travel, lifestyle, and personal development. Every article is reviewed against our editorial policy before publication and updated when facts change.",
   "avatar": "/images/authors/editorial-team.svg",
   "links": {}
 }

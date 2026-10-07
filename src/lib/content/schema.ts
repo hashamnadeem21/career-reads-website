@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { CATEGORY_SLUGS } from "@/lib/categories";
 
 /**
  * Single source of truth for article and author data shape.
@@ -20,6 +19,32 @@ const isoDate = z
     return date.toISOString();
   });
 
+/**
+ * Where an extra image appears inside the article body:
+ *  - "after-intro"        before the first section heading
+ *  - "middle"             under the heading of the middle section
+ *  - "before-conclusion"  before the last section heading
+ *  - "section:<id>"       under a specific H2/H3 heading (id = its anchor, e.g. "section:why-it-matters")
+ */
+export const IMAGE_PLACEMENTS = ["after-intro", "middle", "before-conclusion"] as const;
+export const imagePlacementSchema = z.union([
+  z.enum(IMAGE_PLACEMENTS),
+  z.string().regex(/^section:[a-z0-9-]+$/, 'Use "after-intro", "middle", "before-conclusion", or "section:<heading-id>"'),
+]);
+export type ImagePlacement = z.infer<typeof imagePlacementSchema>;
+
+export const articleImageSchema = z
+  .object({
+    src: z.string().regex(/^\/|^https:\/\//, "Use an absolute path or https URL"),
+    alt: z.string().trim().min(10).max(200),
+    caption: z.string().trim().max(200).optional(),
+    width: z.number().int().positive().default(1600),
+    height: z.number().int().positive().default(900),
+    placement: imagePlacementSchema.default("middle"),
+  })
+  .strict();
+export type ArticleImage = z.infer<typeof articleImageSchema>;
+
 export const articleStatusSchema = z.enum(["draft", "published"]);
 export type ArticleStatus = z.infer<typeof articleStatusSchema>;
 
@@ -27,7 +52,8 @@ export const articleFrontmatterSchema = z
   .object({
     title: z.string().trim().min(10).max(110),
     excerpt: z.string().trim().min(50).max(220),
-    category: z.enum(CATEGORY_SLUGS),
+    /** A category slug. Whether it exists is checked against the category list (files or database). */
+    category: z.string().regex(SLUG_PATTERN),
     tags: z
       .array(z.string().trim().min(2).max(40))
       .min(1)
@@ -45,6 +71,8 @@ export const articleFrontmatterSchema = z
     coverAlt: z.string().trim().min(10).max(200),
     coverWidth: z.number().int().positive().default(1600),
     coverHeight: z.number().int().positive().default(900),
+    /** Extra images shown inside the article (the cover is the hero image at the top). */
+    images: z.array(articleImageSchema).max(3).default([]),
     seoTitle: z.string().trim().max(70).optional(),
     seoDescription: z.string().trim().min(50).max(170).optional(),
     /** Only set when the article was first published elsewhere. */

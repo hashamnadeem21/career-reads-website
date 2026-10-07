@@ -1,0 +1,28 @@
+{
+  "title": "Business Development Executive",
+  "company": "Example Trading Co.",
+  "city": "Islamabad",
+  "workModel": "on-site",
+  "employmentType": "full-time",
+  "category": "sales-business",
+  "experience": "mid",
+  "summary": "Find new clients, build relationships, and grow sales for a B2B services company.",
+  "responsibilities": [
+    "Generate and follow up on leads",
+    "Prepare proposals",
+    "Meet monthly sales targets"
+  ],
+  "requirements": [
+    "2+ years in B2B sales",
+    "Strong communication skills"
+  ],
+  "benefits": [
+    "Commission",
+    "Fuel allowance"
+  ],
+  "postedAt": "2026-09-28",
+  "country": "Pakistan",
+  "status": "published",
+  "sample": true,
+  "applyEmail": "jobs@example.com"
+}

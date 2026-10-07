@@ -37,10 +37,10 @@ export async function deliverContactMessage(input: ContactInput): Promise<boolea
     method: "POST",
     headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      from: env.CONTACT_FROM_EMAIL ?? "BlogNest Contact <onboarding@resend.dev>",
+      from: env.CONTACT_FROM_EMAIL ?? "Career Reads Contact <onboarding@resend.dev>",
       to: [env.CONTACT_TO_EMAIL],
       reply_to: input.email,
-      subject: `[BlogNest contact] ${input.topic} — ${input.name}`,
+      subject: `[Career Reads contact] ${input.topic} — ${input.name}`,
       html: `<p><strong>From:</strong> ${escapeHtml(input.name)} &lt;${escapeHtml(input.email)}&gt;</p>
 <p><strong>Topic:</strong> ${escapeHtml(input.topic)}</p>
 <p style="white-space:pre-wrap">${escapeHtml(input.message)}</p>`,
@@ -76,7 +76,7 @@ export async function deliverNewsletterSignup(email: string): Promise<boolean> {
       "Content-Type": "application/json",
       ...(env.NEWSLETTER_WEBHOOK_SECRET && { Authorization: `Bearer ${env.NEWSLETTER_WEBHOOK_SECRET}` }),
     },
-    body: JSON.stringify({ email, source: "blognest-website", subscribedAt: new Date().toISOString() }),
+    body: JSON.stringify({ email, source: "careerreads-website", subscribedAt: new Date().toISOString() }),
     signal: AbortSignal.timeout(10_000),
   }).catch((error: unknown) => {
     console.error("[newsletter] Webhook request failed", error);

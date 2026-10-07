@@ -4,13 +4,15 @@ import { StaticPage } from "@/components/ui/StaticPage";
 import { POLICY_DATES } from "@/lib/policies";
 import { buildMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
+import { ensureSiteData } from "@/lib/site-data";
 
 const description =
-  "How BlogNest collects, uses, and protects information, including cookies, analytics, advertising, and your choices.";
+  "How Career Reads collects, uses, and protects information, including cookies, analytics, advertising, and your choices.";
 
 export const metadata: Metadata = buildMetadata({ title: "Privacy policy", description, path: "/privacy-policy" });
 
-export default function PrivacyPolicyPage() {
+export default async function PrivacyPolicyPage() {
+  await ensureSiteData();
   return (
     <StaticPage
       eyebrow="Legal"

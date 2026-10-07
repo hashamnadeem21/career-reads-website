@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { BlogListing } from "@/components/article/BlogListing";
-import { CATEGORY_SLUGS, getCategory } from "@/lib/categories";
+import { categoryList, getCategory } from "@/lib/categories";
+import { ensureSiteData } from "@/lib/site-data";
 import { getArticlesByCategory, getCategoryCounts } from "@/lib/content";
 import { categoryTitle, loadCategoryPage } from "@/lib/listing";
 import { buildMetadata } from "@/lib/seo";
@@ -12,7 +13,8 @@ type Props = { params: Promise<{ category: string; page: string }> };
 
 export async function generateStaticParams() {
   const params: { category: string; page: string }[] = [];
-  for (const category of CATEGORY_SLUGS) {
+  await ensureSiteData();
+  for (const category of categoryList.map((c) => c.slug)) {
     const pages = Math.ceil((await getArticlesByCategory(category)).length / siteConfig.pageSize);
     for (let p = 2; p <= pages; p++) params.push({ category, page: String(p) });
   }
@@ -25,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!category) return {};
   return buildMetadata({
     title: categoryTitle(category, Number(page)),
-    description: `Page ${page} of ${category.name} articles on BlogNest. ${category.description}`.slice(0, 160),
+    description: `Page ${page} of ${category.name} articles on Career Reads. ${category.description}`.slice(0, 160),
     path: `/category/${category.slug}/page/${page}`,
   });
 }

@@ -90,7 +90,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex h-12 items-center gap-2 rounded-full bg-gradient-to-r from-brand to-brand-2 px-7 font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:brightness-110 disabled:opacity-70"
+        className="inline-flex h-12 items-center gap-2 rounded-full bg-gradient-to-r from-brand to-brand-2 px-7 font-semibold text-white shadow-lg shadow-blue-500/25 transition hover:brightness-110 disabled:opacity-70"
       >
         {pending ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Send className="h-4 w-4" aria-hidden />}
         {pending ? "Sending…" : "Send message"}

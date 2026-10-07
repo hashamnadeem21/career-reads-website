@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" role="img" aria-label="Abstract lifestyle illustration for the section &quot;A sample 30-minute routine&quot;">
+  <defs>
+    <linearGradient id="bg" gradientTransform="rotate(67)">
+      <stop offset="0" stop-color="#4C0519"/>
+      <stop offset="1" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F43F5E"/>
+      <stop offset="1" stop-color="#FB923C"/>
+    </linearGradient>
+    <radialGradient id="glow0"><stop offset="0" stop-color="#F43F5E" stop-opacity=".75"/><stop offset="1" stop-color="#F43F5E" stop-opacity="0"/></radialGradient>
+    <radialGradient id="glow1"><stop offset="0" stop-color="#FB923C" stop-opacity=".65"/><stop offset="1" stop-color="#FB923C" stop-opacity="0"/></radialGradient>
+    <pattern id="dots" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.6" fill="#fff" fill-opacity=".09"/></pattern>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="1276.9" cy="824.5" r="288.6" fill="url(#glow0)"/>
+  <circle cx="1402.4" cy="200.1" r="499.7" fill="url(#glow1)"/>
+  <circle cx="262.8" cy="76.2" r="327" fill="url(#glow0)"/>
+  <rect width="1600" height="900" fill="url(#dots)"/>
+  <circle cx="1120.4" cy="380" r="170" fill="url(#accent)"/>
+  <path d="M0 560C239.9 440 743.5 620 1600 520V900H0Z" fill="#FB923C" fill-opacity="0.35"/>
+  <path d="M0 645C477.6 525 723.3 705 1600 605V900H0Z" fill="#F43F5E" fill-opacity="0.5"/>
+  <path d="M0 730C265.1 610 943.6 790 1600 690V900H0Z" fill="#FB923C" fill-opacity="0.6499999999999999"/>
+  <path d="M0 815C275 695 796 875 1600 775V900H0Z" fill="#F43F5E" fill-opacity="0.7999999999999999"/>
+</svg>

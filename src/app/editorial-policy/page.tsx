@@ -5,7 +5,7 @@ import { POLICY_DATES } from "@/lib/policies";
 import { buildMetadata } from "@/lib/seo";
 
 const description =
-  "How BlogNest chooses topics, researches and fact-checks articles, uses AI tools responsibly, and keeps content up to date.";
+  "How Career Reads chooses topics, researches and fact-checks articles, uses AI tools responsibly, and keeps content up to date.";
 
 export const metadata: Metadata = buildMetadata({ title: "Editorial policy", description, path: "/editorial-policy" });
 

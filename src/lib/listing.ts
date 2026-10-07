@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getArticleSummaries, getArticlesByCategory, paginate, parsePageParam } from "@/lib/content";
 import { getCategory, type Category } from "@/lib/categories";
+import { ensureSiteData } from "@/lib/site-data";
 import { siteConfig } from "@/lib/site";
 
 /** Shared data loaders for paginated listing routes. */
@@ -20,6 +21,7 @@ export async function blogPageParams() {
 }
 
 export async function loadCategoryPage(slug: string, pageParam?: string) {
+  await ensureSiteData();
   const category = getCategory(slug);
   if (!category) notFound();
   const page = pageParam === undefined ? 1 : parsePageParam(pageParam);

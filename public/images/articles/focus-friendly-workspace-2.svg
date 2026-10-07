@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" role="img" aria-label="Abstract productivity illustration for the section &quot;Start with one change&quot;">
+  <defs>
+    <linearGradient id="bg" gradientTransform="rotate(24)">
+      <stop offset="0" stop-color="#052E2B"/>
+      <stop offset="1" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#10B981"/>
+      <stop offset="1" stop-color="#14B8A6"/>
+    </linearGradient>
+    <radialGradient id="glow0"><stop offset="0" stop-color="#10B981" stop-opacity=".75"/><stop offset="1" stop-color="#10B981" stop-opacity="0"/></radialGradient>
+    <radialGradient id="glow1"><stop offset="0" stop-color="#14B8A6" stop-opacity=".65"/><stop offset="1" stop-color="#14B8A6" stop-opacity="0"/></radialGradient>
+    <pattern id="dots" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.6" fill="#fff" fill-opacity=".09"/></pattern>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="1495.6" cy="504.3" r="500.4" fill="url(#glow0)"/>
+  <circle cx="267.9" cy="627.8" r="453" fill="url(#glow1)"/>
+  <circle cx="626.8" cy="603.5" r="336.1" fill="url(#glow0)"/>
+  <rect width="1600" height="900" fill="url(#dots)"/>
+  <rect x="170" y="170" width="160" height="134.3" rx="18" fill="#fff" fill-opacity="0.18"/>
+  <rect x="170" y="322.3" width="160" height="96.6" rx="18" fill="#6EE7B7" fill-opacity="0.75"/>
+  <rect x="170" y="436.9" width="160" height="89.5" rx="18" fill="#fff" fill-opacity="0.18"/>
+  <rect x="355" y="170" width="160" height="147.1" rx="18" fill="#fff" fill-opacity="0.18"/>
+  <rect x="355" y="335.1" width="160" height="71" rx="18" fill="#6EE7B7" fill-opacity="0.75"/>
+  <rect x="540" y="170" width="160" height="114.5" rx="18" fill="#fff" fill-opacity="0.18"/>
+  <rect x="540" y="302.5" width="160" height="79.6" rx="18" fill="#6EE7B7" fill-opacity="0.75"/>
+  <rect x="725" y="170" width="160" height="110.2" rx="18" fill="#fff" fill-opacity="0.18"/>
+  <rect x="725" y="298.2" width="160" height="92.2" rx="18" fill="#6EE7B7" fill-opacity="0.75"/>
+  <rect x="725" y="408.4" width="160" height="162.1" rx="18" fill="#fff" fill-opacity="0.18"/>
+  <rect x="725" y="588.5" width="160" height="92.5" rx="18" fill="#6EE7B7" fill-opacity="0.75"/>
+  <rect x="910" y="170" width="160" height="102.9" rx="18" fill="#fff" fill-opacity="0.18"/>
+  <rect x="910" y="290.9" width="160" height="101.7" rx="18" fill="#6EE7B7" fill-opacity="0.75"/>
+  <rect x="1095" y="170" width="160" height="144.5" rx="18" fill="#fff" fill-opacity="0.18"/>
+  <rect x="1095" y="332.5" width="160" height="148.8" rx="18" fill="#6EE7B7" fill-opacity="0.75"/>
+  <rect x="1095" y="499.3" width="160" height="154.6" rx="18" fill="#fff" fill-opacity="0.18"/>
+  <rect x="1280" y="170" width="160" height="84.8" rx="18" fill="#fff" fill-opacity="0.18"/>
+  <rect x="1280" y="272.8" width="160" height="115.7" rx="18" fill="#6EE7B7" fill-opacity="0.75"/>
+  <rect x="1280" y="406.5" width="160" height="116" rx="18" fill="#fff" fill-opacity="0.18"/>
+  <circle cx="1330" cy="700" r="70" fill="url(#accent)"/><path d="M1298 702l22 22 44-48" stroke="#fff" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

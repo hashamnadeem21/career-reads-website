@@ -1,0 +1,24 @@
+{
+  "title": "Accounts Officer",
+  "company": "Example Industries",
+  "city": "Faisalabad",
+  "workModel": "on-site",
+  "employmentType": "full-time",
+  "category": "finance-accounting",
+  "experience": "mid",
+  "summary": "Handle day-to-day bookkeeping, payroll, and monthly reports for a manufacturing company.",
+  "responsibilities": [
+    "Record daily transactions",
+    "Prepare payroll",
+    "Reconcile bank statements"
+  ],
+  "requirements": [
+    "B.Com / ACCA part-qualified",
+    "Experience with QuickBooks or similar"
+  ],
+  "postedAt": "2026-09-27",
+  "country": "Pakistan",
+  "status": "published",
+  "sample": true,
+  "applyEmail": "jobs@example.com"
+}

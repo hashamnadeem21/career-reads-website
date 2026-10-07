@@ -1,6 +1,6 @@
 # Google AdSense guide
 
-This guide covers preparing BlogNest for AdSense, applying, setting up `ads.txt`, creating ad units, and keeping placements policy-safe.
+This guide covers preparing Career Reads for AdSense, applying, setting up `ads.txt`, creating ad units, and keeping placements policy-safe.
 
 > AdSense approval is decided by Google and is **not guaranteed**. Nothing in this project can guarantee approval or earnings. Always follow the current [AdSense Program policies](https://support.google.com/adsense/answer/48182).
 
@@ -26,7 +26,7 @@ This guide covers preparing BlogNest for AdSense, applying, setting up `ads.txt`
 
 ## 3. ads.txt setup
 
-`ads.txt` declares which companies may sell ads on your site. BlogNest generates it automatically at `https://your-domain.com/ads.txt`:
+`ads.txt` declares which companies may sell ads on your site. Career Reads generates it automatically at `https://your-domain.com/ads.txt`:
 
 ```
 google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0

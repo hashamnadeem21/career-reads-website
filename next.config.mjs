@@ -1,4 +1,5 @@
-import type { NextConfig } from "next";
+// Plain JavaScript (not next.config.ts) on purpose: hosts with an old glibc can't load Next's
+// native compiler, and the WebAssembly fallback can't compile a TypeScript config.
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -11,7 +12,10 @@ const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
 ];
 
-const nextConfig: NextConfig = {
+/** @type {import("next").NextConfig} */
+const nextConfig = {
+  // Lets test builds use their own folder (e.g. the admin e2e suite) without touching .next.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   poweredByHeader: false,
   reactStrictMode: true,
   // MDX files are read from disk at build/revalidation time, make sure they
@@ -22,7 +26,8 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
     // Add your CDN / CMS image hosts here when you move away from local images.
-    remotePatterns: [],
+    // Images uploaded in the admin panel are stored on Vercel Blob.
+    remotePatterns: [{ protocol: "https", hostname: "*.public.blob.vercel-storage.com" }],
   },
   async headers() {
     return [

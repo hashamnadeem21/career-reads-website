@@ -1,40 +1,41 @@
 import { publicEnv } from "@/lib/env";
+import { runtimeSettings } from "@/lib/settings";
 
 export const siteConfig = {
-  name: "BlogNest",
-  shortName: "BlogNest",
-  tagline: "Clear thinking on technology, AI, and a well-lived life.",
+  name: "Career Reads",
+  shortName: "Career Reads",
+  tagline: "Latest jobs and practical guides.",
   description:
-    "BlogNest publishes practical, carefully edited guides on technology, AI tools, productivity, travel, lifestyle, and personal development.",
+    "Career Reads lists the latest jobs in tech, business, design, and more, and publishes simple, practical guides on technology, AI, productivity, travel, and lifestyle.",
   url: publicEnv.NEXT_PUBLIC_SITE_URL,
   locale: "en_US",
   language: "en",
-  contactEmail: publicEnv.NEXT_PUBLIC_CONTACT_EMAIL,
+  /** From admin Settings when set, otherwise NEXT_PUBLIC_CONTACT_EMAIL. */
+  get contactEmail(): string {
+    return runtimeSettings().site?.contactEmail || publicEnv.NEXT_PUBLIC_CONTACT_EMAIL;
+  },
   /** Number of articles per listing page (blog, categories). */
   pageSize: 6,
   /** ISR window for content pages, in seconds. */
   revalidateSeconds: 3600,
-  social: {
-    // Leave blank until real profiles exist — empty values are not rendered.
-    x: "",
-    linkedin: "",
-    github: "",
+  /** From admin Settings. Leave blank until real profiles exist — empty values are not rendered. */
+  get social(): { x: string; linkedin: string; github: string } {
+    return runtimeSettings().site?.social ?? { x: "", linkedin: "", github: "" };
   },
   nav: [
+    { href: "/", label: "Home" },
+    { href: "/jobs", label: "Jobs" },
     { href: "/blog", label: "Blog" },
-    { href: "/latest", label: "Latest" },
     { href: "/trending", label: "Trending" },
-    { href: "/category/technology", label: "Technology" },
-    { href: "/category/ai", label: "AI" },
     { href: "/about", label: "About" },
+    { href: "/contact", label: "Contact" },
   ],
   footer: {
-    explore: [
-      { href: "/blog", label: "All articles" },
-      { href: "/latest", label: "Latest" },
-      { href: "/trending", label: "Trending" },
-      { href: "/search", label: "Search" },
-      { href: "/rss.xml", label: "RSS feed" },
+    jobs: [
+      { href: "/jobs", label: "All jobs" },
+      { href: "/jobs?type=internship", label: "Internships" },
+      { href: "/jobs?model=remote", label: "Remote jobs" },
+      { href: "/jobs?category=software-it", label: "Software & IT jobs" },
     ],
     company: [
       { href: "/about", label: "About" },

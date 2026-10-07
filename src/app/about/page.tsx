@@ -2,19 +2,21 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { StaticPage } from "@/components/ui/StaticPage";
 import { categoryList } from "@/lib/categories";
+import { ensureSiteData } from "@/lib/site-data";
 import { getAuthors } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
 
 const description =
-  "Learn who writes BlogNest, what we cover, how we research and edit our guides, and how we keep the site independent.";
+  "Learn who writes Career Reads, what we cover, how we research and edit our guides, and how we keep the site independent.";
 
-export const metadata: Metadata = buildMetadata({ title: "About BlogNest", description, path: "/about" });
+export const metadata: Metadata = buildMetadata({ title: "About Career Reads", description, path: "/about" });
 
 export default async function AboutPage() {
+  await ensureSiteData();
   const authors = await getAuthors();
   return (
-    <StaticPage eyebrow="About us" title="About BlogNest" description={description} path="/about">
+    <StaticPage eyebrow="About us" title="About Career Reads" description={description} path="/about">
       <p>
         {siteConfig.name} is an independent publication of practical, carefully edited guides. We write for curious
         people who want clear explanations and useful next steps — not hype, not filler.
@@ -37,7 +39,7 @@ export default async function AboutPage() {
         our <Link href="/corrections-policy">corrections policy</Link> for how we handle mistakes.
       </p>
 
-      <h2>Who writes BlogNest</h2>
+      <h2>Who writes Career Reads</h2>
       <ul>
         {authors.map((a) => (
           <li key={a.slug}>
@@ -48,7 +50,7 @@ export default async function AboutPage() {
 
       <h2>How we&apos;re funded</h2>
       <p>
-        BlogNest may display advertising to support the site. Advertisers never influence our editorial decisions,
+        Career Reads may display advertising to support the site. Advertisers never influence our editorial decisions,
         and ads are always clearly labeled. See our <Link href="/advertising-disclosure">advertising disclosure</Link>{" "}
         for details.
       </p>

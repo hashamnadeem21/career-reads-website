@@ -77,7 +77,7 @@ export function ArticleCard({
   return (
     <article
       className={cn(
-        "group relative flex h-full overflow-hidden rounded-3xl border border-border bg-background transition duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-xl hover:shadow-indigo-500/10",
+        "group relative flex h-full overflow-hidden rounded-3xl border border-border bg-background transition duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-xl hover:shadow-blue-500/10",
         horizontal ? "flex-col sm:flex-row" : "flex-col",
       )}
     >

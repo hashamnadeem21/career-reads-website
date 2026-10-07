@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { BlogListing } from "@/components/article/BlogListing";
-import { CATEGORY_SLUGS, getCategory } from "@/lib/categories";
+import { categoryList, getCategory } from "@/lib/categories";
+import { ensureSiteData } from "@/lib/site-data";
 import { getCategoryCounts } from "@/lib/content";
 import { loadCategoryPage } from "@/lib/listing";
 import { buildMetadata } from "@/lib/seo";
@@ -10,8 +11,9 @@ export const dynamicParams = false;
 
 type Props = { params: Promise<{ category: string }> };
 
-export function generateStaticParams() {
-  return CATEGORY_SLUGS.map((category) => ({ category }));
+export async function generateStaticParams() {
+  await ensureSiteData();
+  return categoryList.map((c) => ({ category: c.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Inter } from "next/font/google";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
@@ -9,17 +9,13 @@ import { getAdsConfig } from "@/lib/ads";
 import { serverEnv } from "@/lib/env";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/jsonld";
 import { siteConfig } from "@/lib/site";
+import { ensureSiteData } from "@/lib/site-data";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-fraunces",
-  display: "swap",
-  axes: ["opsz", "SOFT"],
-});
 
-export function generateMetadata(): Metadata {
+export async function generateMetadata(): Promise<Metadata> {
+  await ensureSiteData();
   const env = serverEnv();
   const ads = getAdsConfig();
 
@@ -60,11 +56,12 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  await ensureSiteData();
   const ads = getAdsConfig();
 
   return (
-    <html lang={siteConfig.language} suppressHydrationWarning className={`${inter.variable} ${fraunces.variable}`}>
+    <html lang={siteConfig.language} suppressHydrationWarning className={inter.variable}>
       <head>
         <link rel="alternate" type="application/rss+xml" title={`${siteConfig.name} RSS feed`} href="/rss.xml" />
         {/* Without JavaScript, scroll-reveal elements must never stay hidden. */}

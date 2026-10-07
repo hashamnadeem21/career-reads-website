@@ -11,7 +11,7 @@ export function CategoryGrid({ counts }: { counts: Record<string, number> }) {
         <Reveal as="li" key={category.slug} delay={(i % 3) * 0.05}>
           <Link
             href={`/category/${category.slug}`}
-            className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-background p-6 transition duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-lg hover:shadow-indigo-500/10"
+            className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-background p-6 transition duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-lg hover:shadow-blue-500/10"
           >
             <span
               aria-hidden

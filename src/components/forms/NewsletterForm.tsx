@@ -54,8 +54,8 @@ export function NewsletterForm({ variant = "default" }: { variant?: "default" | 
           className={cn(
             "inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full px-6 font-semibold transition disabled:opacity-70",
             inverted
-              ? "bg-white text-indigo-700 hover:bg-indigo-50"
-              : "bg-gradient-to-r from-brand to-brand-2 text-white shadow-lg shadow-indigo-500/25 hover:brightness-110",
+              ? "bg-white text-blue-700 hover:bg-blue-50"
+              : "bg-gradient-to-r from-brand to-brand-2 text-white shadow-lg shadow-blue-500/25 hover:brightness-110",
           )}
         >
           {pending ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : null}
@@ -68,11 +68,11 @@ export function NewsletterForm({ variant = "default" }: { variant?: "default" | 
         <input
           type="checkbox"
           name="consent"
-          className="mt-0.5 h-4 w-4 shrink-0 accent-indigo-500"
+          className="mt-0.5 h-4 w-4 shrink-0 accent-blue-600"
           aria-invalid={consentError ? true : undefined}
         />
         <span>
-          Send me the BlogNest newsletter. Unsubscribe anytime. See our{" "}
+          Send me the Career Reads newsletter. Unsubscribe anytime. See our{" "}
           <Link href="/privacy-policy" className="underline underline-offset-2">
             privacy policy
           </Link>

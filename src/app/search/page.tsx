@@ -14,7 +14,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const q = normalizeQuery((await searchParams).q);
   return {
     title: q ? `Search results for “${q}”` : "Search articles",
-    description: "Search BlogNest articles by title, topic, category, or tag.",
+    description: "Search Career Reads articles by title, topic, category, or tag.",
     alternates: { canonical: absoluteUrl("/search") },
     // Internal search result pages should not be indexed.
     robots: { index: false, follow: true },
@@ -52,7 +52,7 @@ export default async function SearchPage({ searchParams }: Props) {
           </div>
           <button
             type="submit"
-            className="h-14 rounded-full bg-gradient-to-r from-brand to-brand-2 px-6 font-semibold text-white shadow-lg shadow-indigo-500/25 hover:brightness-110"
+            className="h-14 rounded-full bg-gradient-to-r from-brand to-brand-2 px-6 font-semibold text-white shadow-lg shadow-blue-500/25 hover:brightness-110"
           >
             Search
           </button>

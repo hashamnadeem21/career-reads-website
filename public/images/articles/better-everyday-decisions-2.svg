@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" role="img" aria-label="Abstract personal growth illustration for the section &quot;A quick decision checklist&quot;">
+  <defs>
+    <linearGradient id="bg" gradientTransform="rotate(37)">
+      <stop offset="0" stop-color="#2E1065"/>
+      <stop offset="1" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8B5CF6"/>
+      <stop offset="1" stop-color="#D946EF"/>
+    </linearGradient>
+    <radialGradient id="glow0"><stop offset="0" stop-color="#8B5CF6" stop-opacity=".75"/><stop offset="1" stop-color="#8B5CF6" stop-opacity="0"/></radialGradient>
+    <radialGradient id="glow1"><stop offset="0" stop-color="#D946EF" stop-opacity=".65"/><stop offset="1" stop-color="#D946EF" stop-opacity="0"/></radialGradient>
+    <pattern id="dots" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.6" fill="#fff" fill-opacity=".09"/></pattern>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="409.4" cy="612.3" r="314.4" fill="url(#glow0)"/>
+  <circle cx="699.1" cy="25.2" r="396" fill="url(#glow1)"/>
+  <circle cx="185.7" cy="330.5" r="495.4" fill="url(#glow0)"/>
+  <rect width="1600" height="900" fill="url(#dots)"/>
+  <rect x="220" y="700" width="190" height="95" rx="10" fill="#fff" fill-opacity="0.12"/>
+  <rect x="410" y="605" width="190" height="190" rx="10" fill="#fff" fill-opacity="0.2"/>
+  <rect x="600" y="510" width="190" height="285" rx="10" fill="#fff" fill-opacity="0.28"/>
+  <rect x="790" y="415" width="190" height="380" rx="10" fill="#fff" fill-opacity="0.36"/>
+  <rect x="980" y="320" width="190" height="475" rx="10" fill="#fff" fill-opacity="0.44"/>
+  <rect x="1170" y="225" width="190" height="570" rx="10" fill="url(#accent)" fill-opacity="1"/>
+  <circle cx="1280" cy="190" r="34" fill="#F0ABFC"/>
+</svg>

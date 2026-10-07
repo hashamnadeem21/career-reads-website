@@ -42,7 +42,7 @@ export function AdSlot({ placement, className }: AdSlotProps) {
           <AdUnit clientId={config.clientId!} slot={slot} format={style.format} layout={style.layout} />
         ) : (
           <span className="px-4 text-center text-xs text-muted">
-            Ad placement: <strong>{placement}</strong> (development placeholder)
+            Ad placement: <strong>{placement}</strong> (placeholder)
           </span>
         )}
       </div>

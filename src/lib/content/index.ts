@@ -1,7 +1,10 @@
 import { cache } from "react";
-import { canPreviewDrafts } from "@/lib/env";
 import type { CategorySlug } from "@/lib/categories";
+import { ensureSiteData } from "@/lib/site-data";
+import { getDb } from "@/lib/db";
+import { canPreviewDrafts } from "@/lib/env";
 import { MdxContentRepository } from "./mdx-repository";
+import { PostgresContentRepository } from "./postgres-repository";
 import type { ContentRepository } from "./repository";
 import type { Article, ArticleSummary, Author } from "./schema";
 import { searchArticles } from "./search";
@@ -15,13 +18,16 @@ export { isPubliclyVisible, toSummary } from "./visibility";
 /**
  * Content service layer. Pages and components import from here only.
  *
- * To move to PostgreSQL: implement `ContentRepository` (e.g. with Drizzle or
- * Prisma), then return it from `getRepository()`. Nothing else changes.
+ * Content comes from PostgreSQL when DATABASE_URL is set (managed in the
+ * admin panel), and from the MDX files in `content/` otherwise.
  */
 let repository: ContentRepository | null = null;
 
 export function getRepository(): ContentRepository {
-  repository ??= new MdxContentRepository();
+  if (!repository) {
+    const db = getDb();
+    repository = db ? new PostgresContentRepository(db) : new MdxContentRepository();
+  }
   return repository;
 }
 
@@ -32,7 +38,7 @@ export function setRepository(next: ContentRepository | null): void {
 
 /** All articles the current environment is allowed to show, newest first. */
 export const getAllArticles = cache(async (): Promise<Article[]> => {
-  const articles = await getRepository().listArticles();
+  const [articles] = await Promise.all([getRepository().listArticles(), ensureSiteData()]);
   if (canPreviewDrafts()) return articles;
   const now = new Date();
   return articles.filter((a) => isPubliclyVisible(a, now));

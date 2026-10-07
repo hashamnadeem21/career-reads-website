@@ -58,6 +58,11 @@ trending: false
 editorsPick: false
 coverImage: /images/covers/${slug}.svg
 coverAlt: "TODO: describe the cover image for screen readers"
+# Up to 3 extra images inside the article. placement: after-intro | middle | before-conclusion | section:<heading-id>
+images:
+  - src: /images/articles/${slug}-1.svg
+    alt: "TODO: describe this image for screen readers"
+    placement: middle
 # seoTitle: "Optional, ≤ 70 characters"
 # seoDescription: "Optional, 50–170 characters"
 ---

@@ -9,7 +9,7 @@ interface PageMetadataInput {
   /** Override the absolute og:image URL. Defaults to the site-wide OG image. */
   image?: { url: string; alt: string; width?: number; height?: number };
   noindex?: boolean;
-  /** Skip the " | BlogNest" title template (used on the homepage). */
+  /** Skip the " | Career Reads" title template (used on the homepage). */
   absoluteTitle?: boolean;
 }
 
