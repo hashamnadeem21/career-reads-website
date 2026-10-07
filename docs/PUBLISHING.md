@@ -1,6 +1,6 @@
 # Publishing workflow
 
-Articles are MDX files in `content/articles/`. The file name is the URL slug (`content/articles/fix-slow-home-wifi.mdx` → `/blog/fix-slow-home-wifi`). Changing a file name changes the URL — add a redirect in `next.config.ts` if you ever rename a published article.
+Articles are MDX files in `content/articles/`. The file name is the URL slug (`content/articles/fix-slow-home-wifi.mdx` → `/blog/fix-slow-home-wifi`). Changing a file name changes the URL — add a redirect in `next.config.mjs` if you ever rename a published article.
 
 ## 1. Create a draft
 

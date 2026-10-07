@@ -15,7 +15,8 @@
     "content:new": "node scripts/new-article.mjs",
     "covers": "node scripts/generate-covers.mjs",
     "brand": "node scripts/build-brand-assets.mjs",
-    "check": "npm run lint && npm run typecheck && npm run test && npm run build"
+    "check": "npm run lint && npm run typecheck && npm run test && npm run build",
+    "build:webpack": "next build --webpack"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
