@@ -1,14 +1,12 @@
 import "server-only";
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { desc } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import { z } from "zod";
-import { jobs as jobsTable, type JobRow } from "@/db/schema";
 import { ensureSiteData } from "@/lib/site-data";
 import { SLUG_PATTERN } from "@/lib/content/schema";
-import { getDb } from "@/lib/db";
+import { apiGet, apiPath, hasApi } from "@/lib/api/client";
 import { isJobCategorySlug, type EmploymentType, type ExperienceLevel, type JobCategorySlug, type WorkModel } from "./categories";
 import { jobSchema, type Job } from "./schema";
 
@@ -33,51 +31,15 @@ export function parseJobFile(fileName: string, source: string): Job {
   return { ...parsed.data, slug };
 }
 
-/** Maps a database row to a Job, validated with the same schema as the JSON files. */
-export function rowToJob(row: JobRow): Job | null {
-  const parsed = jobSchema.safeParse({
-    title: row.title,
-    company: row.company,
-    companyWebsite: row.companyWebsite ?? undefined,
-    city: row.city ?? undefined,
-    country: row.country,
-    workModel: row.workModel,
-    employmentType: row.employmentType,
-    category: row.category,
-    experience: row.experience,
-    salary: row.salary ?? undefined,
-    summary: row.summary,
-    responsibilities: row.responsibilities,
-    requirements: row.requirements,
-    benefits: row.benefits,
-    applyUrl: row.applyUrl ?? undefined,
-    applyEmail: row.applyEmail ?? undefined,
-    postedAt: row.postedAt,
-    deadline: row.deadline ?? undefined,
-    status: row.status,
-    featured: row.featured,
-    sample: row.sample,
-  });
-  if (!parsed.success) {
-    console.error(`Skipping job "${row.slug}" from the database:\n${z.prettifyError(parsed.error)}`);
-    return null;
-  }
-  return { ...parsed.data, slug: row.slug };
-}
-
-const loadJobsFromDb = unstable_cache(
-  async (): Promise<Job[]> => {
-    const db = getDb();
-    if (!db) return [];
-    const rows = await db.select().from(jobsTable).orderBy(desc(jobsTable.featured), desc(jobsTable.postedAt));
-    return rows.map(rowToJob).filter((j): j is Job => j !== null);
-  },
-  ["db-jobs"],
+/** Visible jobs from the API (it applies isJobVisible), cached until the API revalidates "jobs". */
+const loadJobsFromApi = unstable_cache(
+  async (): Promise<Job[]> => (await apiGet<Job[]>(apiPath("/public/jobs"))) ?? [],
+  ["api-jobs"],
   { tags: ["jobs"], revalidate: 3600 },
 );
 
 async function loadJobs(): Promise<Job[]> {
-  if (getDb()) return loadJobsFromDb();
+  if (hasApi()) return loadJobsFromApi();
   return loadJobsFromFiles();
 }
 

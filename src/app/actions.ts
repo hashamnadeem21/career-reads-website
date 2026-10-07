@@ -9,10 +9,13 @@ import { contactSchema, isSuspiciousTiming, newsletterSchema } from "@/lib/forms
 
 const RATE_WINDOW_MS = 10 * 60 * 1000;
 
-async function clientKey(scope: string): Promise<string> {
+async function visitorIp(): Promise<string | null> {
   const h = await headers();
-  const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || "unknown";
-  return `${scope}:${ip}`;
+  return h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || null;
+}
+
+async function clientKey(scope: string): Promise<string> {
+  return `${scope}:${(await visitorIp()) ?? "unknown"}`;
 }
 
 function formValues(formData: FormData, fields: string[]): Record<string, string> {
@@ -37,8 +40,8 @@ export async function subscribeToNewsletter(_prev: FormState, formData: FormData
     return { status: "error", message: "Too many attempts. Please try again in a few minutes.", values };
   }
 
-  // Saved for the admin inbox (when a database is configured) and sent to the newsletter webhook.
-  const [stored, delivered] = await Promise.all([storeSubscriber(parsed.data.email), deliverNewsletterSignup(parsed.data.email)]);
+  // Saved for the admin inbox (when the API is configured) and sent to the newsletter webhook.
+  const [stored, delivered] = await Promise.all([storeSubscriber(parsed.data.email, await visitorIp()), deliverNewsletterSignup(parsed.data.email)]);
   const ok = stored === true || delivered;
   return ok
     ? silentSuccess(successMessage)
@@ -60,8 +63,8 @@ export async function sendContactMessage(_prev: FormState, formData: FormData): 
     return { status: "error", message: "Too many messages. Please try again in a few minutes.", values };
   }
 
-  // Saved to the admin inbox (when a database is configured) and emailed when delivery is set up.
-  const [stored, delivered] = await Promise.all([storeContactMessage(parsed.data), deliverContactMessage(parsed.data)]);
+  // Saved to the admin inbox (when the API is configured) and emailed when delivery is set up.
+  const [stored, delivered] = await Promise.all([storeContactMessage(parsed.data, await visitorIp()), deliverContactMessage(parsed.data)]);
   const ok = stored === true || delivered;
   return ok
     ? silentSuccess(successMessage)

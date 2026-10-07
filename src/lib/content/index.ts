@@ -1,10 +1,10 @@
 import { cache } from "react";
 import type { CategorySlug } from "@/lib/categories";
 import { ensureSiteData } from "@/lib/site-data";
-import { getDb } from "@/lib/db";
+import { hasApi } from "@/lib/api/client";
 import { canPreviewDrafts } from "@/lib/env";
 import { MdxContentRepository } from "./mdx-repository";
-import { PostgresContentRepository } from "./postgres-repository";
+import { ApiContentRepository } from "./api-repository";
 import type { ContentRepository } from "./repository";
 import type { Article, ArticleSummary, Author } from "./schema";
 import { searchArticles } from "./search";
@@ -18,15 +18,14 @@ export { isPubliclyVisible, toSummary } from "./visibility";
 /**
  * Content service layer. Pages and components import from here only.
  *
- * Content comes from PostgreSQL when DATABASE_URL is set (managed in the
+ * Content comes from the Career Reads API when API_URL is set (managed in the
  * admin panel), and from the MDX files in `content/` otherwise.
  */
 let repository: ContentRepository | null = null;
 
 export function getRepository(): ContentRepository {
   if (!repository) {
-    const db = getDb();
-    repository = db ? new PostgresContentRepository(db) : new MdxContentRepository();
+    repository = hasApi() ? new ApiContentRepository() : new MdxContentRepository();
   }
   return repository;
 }

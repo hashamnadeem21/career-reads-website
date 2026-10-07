@@ -25,8 +25,8 @@ export default defineConfig({
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 240_000,
-    // File-content mode: never read from or write to the local/production database
-    // (the admin repo's e2e suite covers database mode against its own test database).
-    env: { NEXT_PUBLIC_SITE_URL: `http://localhost:${PORT}`, DATABASE_URL: "", REVALIDATE_SECRET: "" },
+    // File-content mode: never call the local or production API
+    // (the API and admin repos cover API mode against their own test database).
+    env: { NEXT_PUBLIC_SITE_URL: `http://localhost:${PORT}`, API_URL: "", SITE_API_KEY: "", REVALIDATE_SECRET: "" },
   },
 });

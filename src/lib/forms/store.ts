@@ -1,32 +1,37 @@
 import "server-only";
-import { messages, subscribers } from "@/db/schema";
-import { getDb } from "@/lib/db";
+import { apiPath, apiPost, hasApi } from "@/lib/api/client";
 import type { ContactInput } from "./schemas";
 
 /**
- * Saves form submissions to the admin panel's inbox. Returns true when stored,
- * false when storing failed, and null when no database is configured.
+ * Saves form submissions to the admin panel's inbox through the API. Returns true when
+ * stored, false when storing failed, and null when no API is configured.
+ * `ip` is the visitor's address, so the API rate-limits per visitor.
  */
-export async function storeContactMessage(input: Pick<ContactInput, "name" | "email" | "topic" | "message">): Promise<boolean | null> {
-  const db = getDb();
-  if (!db) return null;
+export async function storeContactMessage(
+  input: Pick<ContactInput, "name" | "email" | "topic" | "message">,
+  ip: string | null,
+): Promise<boolean | null> {
+  if (!hasApi()) return null;
   try {
-    await db.insert(messages).values({ name: input.name, email: input.email, topic: input.topic || null, message: input.message });
+    await apiPost(
+      apiPath("/public/contact"),
+      { name: input.name, email: input.email, topic: input.topic, message: input.message },
+      { ip },
+    );
     return true;
   } catch (error) {
-    console.error("[contact] Could not save the message to the database", error);
+    console.error("[contact] Could not save the message through the API", error);
     return false;
   }
 }
 
-export async function storeSubscriber(email: string): Promise<boolean | null> {
-  const db = getDb();
-  if (!db) return null;
+export async function storeSubscriber(email: string, ip: string | null): Promise<boolean | null> {
+  if (!hasApi()) return null;
   try {
-    await db.insert(subscribers).values({ email: email.toLowerCase() }).onConflictDoNothing({ target: subscribers.email });
+    await apiPost(apiPath("/public/subscribe"), { email }, { ip });
     return true;
   } catch (error) {
-    console.error("[newsletter] Could not save the subscriber to the database", error);
+    console.error("[newsletter] Could not save the subscriber through the API", error);
     return false;
   }
 }

@@ -8,7 +8,7 @@ import { JobList, JobTag, defaultJobCategoryIcon, jobCategoryIcons } from "@/com
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { hasDatabase } from "@/lib/db";
+import { hasApi } from "@/lib/api/client";
 import { getJobBySlug, getJobs, getRelatedJobs, jobLocation, type Job } from "@/lib/jobs";
 import { employmentTypeLabels, experienceLabels, jobCategories, workModelLabels } from "@/lib/jobs/categories";
 import { jobPostingJsonLd } from "@/lib/jsonld";
@@ -91,7 +91,7 @@ export default async function JobPage({ params }: Props) {
 
   return (
     <>
-      {hasDatabase() && <StatsBeacon path={`/jobs/${job.slug}`} />}
+      {hasApi() && <StatsBeacon path={`/jobs/${job.slug}`} />}
       {job.sample && (
         <div role="status" className="bg-amber-400 px-4 py-2 text-center text-sm font-semibold text-amber-950">
           Sample job: shown in development only. Replace it with real listings before going live.

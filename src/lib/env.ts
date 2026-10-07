@@ -87,9 +87,17 @@ const serverSchema = z.object({
   CONTACT_FROM_EMAIL: optionalString,
   NEWSLETTER_WEBHOOK_URL: z.preprocess(emptyToUndefined, z.url().optional()),
   NEWSLETTER_WEBHOOK_SECRET: optionalString,
-  /** Postgres shared with the admin panel. Without it, content is read from `content/`. */
-  DATABASE_URL: z.preprocess(emptyToUndefined, z.string().regex(/^postgres(ql)?:\/\//).optional()),
-  /** Shared secret the admin panel sends to /api/revalidate. */
+  /** The Career Reads API (blognest-api), e.g. http://localhost:4000. Without it, content is read from `content/`. */
+  API_URL: z.preprocess(
+    emptyToUndefined,
+    z
+      .url()
+      .optional()
+      .transform((v) => v?.replace(/\/+$/, "")),
+  ),
+  /** Sent to the API as X-Api-Key (form submissions, stats, draft previews). Same value as SITE_API_KEY there. */
+  SITE_API_KEY: optionalString,
+  /** Shared secret the API sends to /api/revalidate after saves. */
   REVALIDATE_SECRET: z.preprocess(emptyToUndefined, z.string().min(16).optional()),
 });
 

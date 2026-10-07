@@ -1,7 +1,7 @@
 /**
  * Blog categories.
  *
- * The typed list below is the built-in default. When DATABASE_URL is set the
+ * The typed list below is the built-in default. When API_URL is set the
  * admin panel manages categories in the database, and `ensureSiteData()`
  * (src/lib/categories-loader.ts) replaces the contents of `categories` and
  * `categoryList` in place before pages read them, so every existing
