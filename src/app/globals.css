@@ -7,27 +7,27 @@
 :root {
   --background: #ffffff;
   --surface: #f8fafc;
-  --surface-strong: #eef2ff;
+  --surface-strong: #eff6ff;
   --foreground: #0f172a;
   --muted: #475569;
   --border: #e2e8f0;
   /* Brand colors */
-  --brand: #6366f1;
-  --brand-2: #8b5cf6;
+  --brand: #2563eb;
+  --brand-2: #0ea5e9;
   --navy: #0f172a;
   /* Text-safe brand tone (≥ 4.5:1 on white) */
-  --link: #4f46e5;
+  --link: #1d4ed8;
   color-scheme: light;
 }
 
 .dark {
   --background: #0b1222;
   --surface: #0f172a;
-  --surface-strong: #1e1b4b;
+  --surface-strong: #172554;
   --foreground: #e2e8f0;
   --muted: #a3b1c6;
   --border: #1e293b;
-  --link: #a5b4fc;
+  --link: #93c5fd;
   color-scheme: dark;
 }
 
@@ -43,7 +43,8 @@
   --color-navy: var(--navy);
   --color-link: var(--link);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  /* One clean sans-serif everywhere keeps the site simple and easy to read. */
+  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
@@ -75,6 +76,21 @@
     html {
       scroll-behavior: smooth;
     }
+  }
+
+  /* Lenis smooth scrolling (see SmoothScroll.tsx) drives scrolling itself. */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+  .lenis.lenis-stopped {
+    overflow: clip;
   }
 }
 
@@ -167,9 +183,22 @@
     transform: none;
   }
 }
+/* Gentle bobbing for the tags floating around the hero scene. */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
 @media (prefers-reduced-motion: no-preference) {
   .animate-rise {
     animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
   }
 }
 

@@ -5,7 +5,7 @@ const SLUG = "how-passkeys-work";
 test("article page has metadata, structured data, TOC and related content", async ({ page }) => {
   await page.goto(`/blog/${SLUG}`);
 
-  await expect(page).toHaveTitle("Passkeys Explained: How Passwordless Sign-In Works | BlogNest");
+  await expect(page).toHaveTitle("Passkeys Explained: How Passwordless Sign-In Works | Career Reads");
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", new RegExp(`/blog/${SLUG}$`));
   await expect(page.locator('meta[property="og:type"]')).toHaveAttribute("content", "article");
   await expect(page.locator('meta[property="og:image"]').first()).toHaveAttribute("content", /opengraph-image/);
@@ -42,4 +42,21 @@ test("ads are not rendered without configuration", async ({ page }) => {
   await page.goto(`/blog/${SLUG}`);
   await expect(page.locator("ins.adsbygoogle")).toHaveCount(0);
   await expect(page.locator('script[src*="adsbygoogle"]')).toHaveCount(0);
+});
+
+test("article shows its hero image and in-article images in place", async ({ page }) => {
+  await page.goto("/blog/how-passkeys-work");
+  await expect(page.locator("article header img")).toHaveCount(2); // author avatar + hero image
+  const figures = page.locator("article .prose figure img");
+  await expect(figures).toHaveCount(2);
+  // "middle" image sits right under the middle section heading.
+  const nextToHeading = page.locator("h2#synced-passkeys-vs-device-bound-passkeys + figure img");
+  await expect(nextToHeading).toHaveAttribute("src", /how-passkeys-work-1\.svg/);
+});
+
+test("homepage hero renders the animated 3D scene", async ({ page }) => {
+  await page.goto("/");
+  const canvas = page.locator("section canvas").first();
+  await expect(canvas).toBeVisible();
+  expect(await canvas.evaluate((c: HTMLCanvasElement) => c.width > 0 && c.height > 0)).toBe(true);
 });

@@ -1,13 +1,15 @@
 import { Search } from "lucide-react";
 import Link from "next/link";
 import { categoryList } from "@/lib/categories";
+import { ensureSiteData } from "@/lib/site-data";
 import { siteConfig } from "@/lib/site";
 import { Logo } from "./Logo";
 import { MobileNav } from "./MobileNav";
 import { NavLinks } from "./NavLinks";
 import { ThemeToggle } from "./ThemeToggle";
 
-export function Header() {
+export async function Header() {
+  await ensureSiteData();
   const categoryLinks = categoryList.map((c) => ({ href: `/category/${c.slug}`, label: c.name }));
 
   return (

@@ -13,7 +13,7 @@ export const revalidate = 3600;
 
 const LIMIT = 24;
 const title = "Latest articles";
-const description = "The newest guides and explainers from BlogNest, organized by month of publication.";
+const description = "The newest guides and explainers from Career Reads, organized by month of publication.";
 
 export const metadata: Metadata = buildMetadata({ title, description, path: "/latest" });
 

@@ -1,191 +1,195 @@
-import { Flame, Hash, Sparkles } from "lucide-react";
+import { BookOpen, Briefcase, Code, GraduationCap, Laptop, Search } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArticleCard, ArticleMetaLine } from "@/components/article/ArticleCard";
+import { AdSlot } from "@/components/ads/AdSlot";
 import { ArticleGrid } from "@/components/article/ArticleGrid";
 import { CategoryGrid } from "@/components/home/CategoryGrid";
-import { LeadStory } from "@/components/home/LeadStory";
+import { HeroScene } from "@/components/home/HeroScene";
 import { NewsletterBand } from "@/components/home/NewsletterBand";
-import { Reveal } from "@/components/ui/Reveal";
+import { JobList, defaultJobCategoryIcon, jobCategoryIcons } from "@/components/jobs/JobCard";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import {
-  getCategoryCounts,
-  getEditorsPicks,
-  getFeaturedArticles,
-  getLatestArticles,
-  getTopicTags,
-  getTrendingArticles,
-} from "@/lib/content";
+import { getCategoryCounts, getLatestArticles } from "@/lib/content";
+import { getJobCategoryCounts, getJobs } from "@/lib/jobs";
+import { jobCategoryList } from "@/lib/jobs/categories";
 import { buildMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
-import { humanizeTag } from "@/lib/utils";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = buildMetadata({
-  title: `${siteConfig.name} — Practical guides to technology, AI, and living well`,
+  title: `${siteConfig.name} — Latest jobs and practical guides`,
   description: siteConfig.description,
   path: "/",
   absoluteTitle: true,
 });
 
+/** Shortcut tags that float around the 3D scene. */
+const floatingTags = [
+  { href: "/jobs?category=software-it", label: "Software & IT", icon: Code, className: "left-0 top-[12%]", delay: "0s" },
+  { href: "/jobs?model=remote", label: "Remote jobs", icon: Laptop, className: "right-0 top-[38%]", delay: "1.2s" },
+  { href: "/jobs?type=internship", label: "Internships", icon: GraduationCap, className: "bottom-[10%] left-[8%]", delay: "2.4s" },
+];
+
+const quickLinks = [
+  { href: "/jobs", label: "All jobs", icon: Briefcase },
+  { href: "/jobs?type=internship", label: "Internships", icon: GraduationCap },
+  { href: "/jobs?model=remote", label: "Remote jobs", icon: Laptop },
+  { href: "/blog", label: "Blog", icon: BookOpen },
+];
+
 export default async function HomePage() {
-  const [featured, latest, trending, picks, topics, counts] = await Promise.all([
-    getFeaturedArticles(3),
-    getLatestArticles(9),
-    getTrendingArticles(5),
-    getEditorsPicks(4),
-    getTopicTags(10),
+  const [jobs, jobCounts, articles, articleCounts] = await Promise.all([
+    getJobs(),
+    getJobCategoryCounts(),
+    getLatestArticles(6),
     getCategoryCounts(),
   ]);
-  const [lead, ...secondary] = featured;
-  const featuredSlugs = new Set(featured.map((a) => a.slug));
-  const latestRest = latest.filter((a) => !featuredSlugs.has(a.slug)).slice(0, 6);
 
   return (
     <>
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -left-40 -top-40 h-[28rem] w-[28rem] rounded-full bg-brand/20 blur-3xl" />
-          <div className="absolute -right-32 top-20 h-[24rem] w-[24rem] rounded-full bg-brand-2/20 blur-3xl" />
-        </div>
-        <div className="container-page pb-16 pt-10 sm:pt-14 lg:pb-20">
-          <div>
-            <div className="animate-rise" style={{ animationDelay: "0ms" }}>
-              <p className="eyebrow inline-flex items-center gap-2">
-                <Sparkles className="h-3.5 w-3.5" aria-hidden /> Independent · Practical · Carefully edited
-              </p>
-            </div>
-            <div className="animate-rise" style={{ animationDelay: "80ms" }}>
-              <h1 className="mt-4 max-w-4xl font-display text-[2.6rem] font-semibold leading-[1.05] tracking-tight text-balance sm:text-6xl lg:text-7xl">
-                Clear thinking on <span className="text-gradient">technology, AI</span> and a well-lived life.
-              </h1>
-            </div>
-            <div className="animate-rise" style={{ animationDelay: "160ms" }}>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted">
-                In-depth guides and explainers you can actually use — researched, edited, and kept up to date by the
-                BlogNest editorial team.
-              </p>
-            </div>
-          </div>
-
-          {lead && (
-            <div className="mt-10 grid gap-6 lg:mt-14 lg:grid-cols-[1.6fr_1fr] lg:gap-8">
-              <LeadStory article={lead} />
-              <div className="grid gap-6">
-                {secondary.map((article) => (
-                  <ArticleCard key={article.slug} article={article} headingLevel={2} />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Trending topics */}
-      {topics.length > 0 && (
-        <section aria-labelledby="topics-heading" className="border-y border-border bg-surface">
-          <div className="container-page flex flex-col gap-4 py-6 sm:flex-row sm:items-center">
-            <h2 id="topics-heading" className="flex shrink-0 items-center gap-2 text-sm font-semibold">
-              <Hash className="h-4 w-4 text-link" aria-hidden /> Topics we&apos;re covering
-            </h2>
-            <ul className="flex flex-wrap gap-2">
-              {topics.map(({ tag }) => (
-                <li key={tag}>
-                  <Link
-                    href={`/search?q=${encodeURIComponent(tag)}`}
-                    className="inline-block rounded-full border border-border bg-background px-3 py-1.5 text-sm capitalize text-muted transition-colors hover:border-brand hover:text-link"
-                  >
-                    {humanizeTag(tag)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      )}
-
-      {/* Latest */}
-      <section aria-labelledby="latest-heading" className="container-page py-20">
-        <SectionHeading
-          id="latest-heading"
-          eyebrow="Fresh off the press"
-          title="Latest articles"
-          description="Our newest guides and explainers, most recent first."
-          href="/latest"
-          linkLabel="All latest articles"
+      {/* Hero: job search on the left, animated 3D scene on the right */}
+      <section className="relative overflow-hidden border-b border-border bg-surface">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_75%_40%,color-mix(in_oklab,var(--brand)_12%,transparent),transparent_60%)]"
         />
-        <ArticleGrid articles={latestRest} adAfter={3} />
+        <div className="container-page relative grid items-center gap-8 py-12 sm:py-16 lg:grid-cols-[1.05fr_1fr] lg:gap-12 lg:py-20">
+          <div>
+            <p className="animate-rise inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1 text-xs font-semibold text-link">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden /> Fresh jobs, updated regularly
+            </p>
+            <h1
+              className="animate-rise mt-5 max-w-2xl text-4xl font-bold leading-[1.1] tracking-tight text-balance sm:text-5xl lg:text-6xl"
+              style={{ animationDelay: "80ms" }}
+            >
+              Find your next job. <span className="text-gradient">Learn something useful.</span>
+            </h1>
+            <p className="animate-rise mt-5 max-w-xl text-lg leading-relaxed text-muted" style={{ animationDelay: "160ms" }}>
+              Fresh job openings in tech, business, design, and more, plus simple guides on technology, AI, and
+              everyday life.
+            </p>
+
+            <form
+              action="/jobs"
+              method="get"
+              role="search"
+              className="animate-rise mt-8 flex max-w-xl flex-col gap-2 rounded-xl border border-border bg-background p-2 shadow-lg shadow-blue-500/5 sm:flex-row"
+              style={{ animationDelay: "240ms" }}
+            >
+              <label htmlFor="home-q" className="sr-only">
+                Search jobs
+              </label>
+              <div className="relative flex-1">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" aria-hidden />
+                <input
+                  id="home-q"
+                  name="q"
+                  type="search"
+                  placeholder="Job title, company, or city"
+                  className="h-12 w-full rounded-lg bg-transparent pl-10 pr-3 text-base focus:outline-none"
+                />
+              </div>
+              <button type="submit" className="h-12 rounded-lg bg-brand px-6 font-semibold text-white hover:opacity-90">
+                Search jobs
+              </button>
+            </form>
+
+            <nav aria-label="Quick links" className="animate-rise mt-6" style={{ animationDelay: "320ms" }}>
+              <ul className="flex flex-wrap gap-2">
+                {quickLinks.map(({ href, label, icon: Icon }) => (
+                  <li key={href}>
+                    <Link
+                      href={href}
+                      className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-3.5 py-2 text-sm font-medium hover:border-brand hover:text-link"
+                    >
+                      <Icon className="h-4 w-4 text-link" aria-hidden />
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+
+          <div className="relative mx-auto aspect-square w-full max-w-[22rem] sm:max-w-md lg:max-w-none">
+            <HeroScene className="absolute inset-0 h-full w-full" />
+            {floatingTags.map(({ href, label, icon: Icon, className, delay }) => (
+              <Link
+                key={href}
+                href={href}
+                style={{ animationDelay: delay }}
+                className={`animate-float absolute hidden items-center gap-2 rounded-xl border border-border bg-background/90 px-3 py-2 text-sm font-semibold shadow-lg shadow-blue-500/10 backdrop-blur hover:border-brand hover:text-link sm:inline-flex ${className}`}
+              >
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-surface-strong text-link" aria-hidden>
+                  <Icon className="h-4 w-4" />
+                </span>
+                {label}
+              </Link>
+            ))}
+          </div>
+        </div>
       </section>
 
-      {/* Trending + Editor's picks */}
-      <section className="container-page grid gap-12 pb-20 lg:grid-cols-[1fr_1.35fr] lg:gap-16">
-        <div>
-          <SectionHeading
-            id="trending-heading"
-            eyebrow="Editor-curated"
-            title={
-              <span className="inline-flex items-center gap-2">
-                Trending now <Flame className="h-7 w-7 text-orange-500" aria-hidden />
-              </span>
-            }
-            href="/trending"
-          />
-          <ol className="space-y-1">
-            {trending.map((article, i) => (
-              <Reveal as="li" key={article.slug} delay={i * 0.04}>
-                <div className="group relative flex gap-5 rounded-2xl p-4 transition-colors hover:bg-surface">
-                  <span className="font-display text-4xl font-semibold text-gradient tabular-nums" aria-hidden>
-                    {String(i + 1).padStart(2, "0")}
+      {/* Job categories */}
+      <section aria-labelledby="job-categories" className="container-page py-14">
+        <SectionHeading id="job-categories" title="Browse jobs by category" href="/jobs" linkLabel="All jobs" />
+        <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {jobCategoryList.map((category) => {
+            const Icon = jobCategoryIcons[category.slug] ?? defaultJobCategoryIcon;
+            const count = jobCounts[category.slug] ?? 0;
+            return (
+              <li key={category.slug}>
+                <Link
+                  href={`/jobs?category=${category.slug}`}
+                  className="flex h-full items-center gap-3 rounded-xl border border-border bg-background p-4 transition-colors hover:border-brand"
+                >
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-strong text-link" aria-hidden>
+                    <Icon className="h-5 w-5" />
                   </span>
-                  <div className="min-w-0">
-                    <h3 className="font-display text-lg font-semibold leading-snug">
-                      <Link href={`/blog/${article.slug}`} className="after:absolute after:inset-0 group-hover:text-link">
-                        {article.title}
-                      </Link>
-                    </h3>
-                    <ArticleMetaLine article={article} className="mt-1.5" />
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </ol>
-        </div>
-
-        <div>
-          <SectionHeading
-            id="picks-heading"
-            eyebrow="Handpicked"
-            title="Editor's picks"
-            description="Guides our editors recommend starting with."
-          />
-          <ul className="grid gap-6">
-            {picks.map((article, i) => (
-              <Reveal as="li" key={article.slug} delay={i * 0.05}>
-                <ArticleCard article={article} variant="horizontal" />
-              </Reveal>
-            ))}
-          </ul>
-        </div>
+                  <span className="min-w-0">
+                    <span className="block text-sm font-semibold leading-snug">{category.name}</span>
+                    <span className="text-xs text-muted">
+                      {count} {count === 1 ? "job" : "jobs"}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       </section>
 
-      {/* Categories */}
-      <section aria-labelledby="categories-heading" className="bg-surface py-20">
+      {/* Latest jobs */}
+      <section aria-labelledby="latest-jobs" className="container-page pb-14">
+        <SectionHeading id="latest-jobs" title="Latest jobs" href="/jobs" linkLabel="See all jobs" />
+        {jobs.length > 0 ? (
+          <JobList jobs={jobs.slice(0, 6)} />
+        ) : (
+          <p className="rounded-xl border border-dashed border-border p-8 text-center text-muted">
+            New jobs are coming soon. Check back shortly.
+          </p>
+        )}
+      </section>
+
+      <div className="container-page">
+        <AdSlot placement="listing" className="mt-0" />
+      </div>
+
+      {/* Latest articles */}
+      <section aria-labelledby="latest-articles" className="container-page py-14">
+        <SectionHeading id="latest-articles" title="Latest articles" href="/blog" linkLabel="All articles" />
+        <ArticleGrid articles={articles} />
+      </section>
+
+      {/* Blog categories */}
+      <section aria-labelledby="blog-categories" className="bg-surface py-14">
         <div className="container-page">
-          <SectionHeading
-            id="categories-heading"
-            eyebrow="Explore"
-            title="Browse by category"
-            description="Find guides on the topics you care about most."
-            href="/blog"
-            linkLabel="All articles"
-          />
-          <CategoryGrid counts={counts} />
+          <SectionHeading id="blog-categories" title="Read by topic" href="/blog" linkLabel="All articles" />
+          <CategoryGrid counts={articleCounts} />
         </div>
       </section>
 
-      <div className="pt-20">
+      <div className="pt-14">
         <NewsletterBand />
       </div>
     </>

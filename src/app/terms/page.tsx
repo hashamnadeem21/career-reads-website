@@ -5,7 +5,7 @@ import { POLICY_DATES } from "@/lib/policies";
 import { buildMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
 
-const description = "The terms that apply when you read, share, or interact with content on BlogNest.";
+const description = "The terms that apply when you read, share, or interact with content on Career Reads.";
 
 export const metadata: Metadata = buildMetadata({ title: "Terms of service", description, path: "/terms" });
 

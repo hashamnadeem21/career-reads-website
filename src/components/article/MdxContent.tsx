@@ -7,7 +7,9 @@ import type { ComponentProps, ReactNode } from "react";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import { AdSlot } from "@/components/ads/AdSlot";
-import { injectInArticleAd } from "@/lib/content/toc";
+import { remarkSafeMdx } from "@/lib/content/safe-mdx";
+import type { ArticleImage } from "@/lib/content/schema";
+import { injectArticleImages, injectInArticleAd } from "@/lib/content/toc";
 import { cn, formatDate } from "@/lib/utils";
 
 const calloutStyles = {
@@ -76,28 +78,43 @@ function Figure({ src, alt, width, height, caption }: { src: string; alt: string
   );
 }
 
-function buildComponents(adsEnabled: boolean): MDXComponents {
+function buildComponents(adsEnabled: boolean, images: ArticleImage[]): MDXComponents {
   return {
     a: SmartLink,
     Callout,
     Correction,
     Figure,
+    /** Placed automatically from the article's `images` list (see injectArticleImages). */
+    ArticleImage: ({ index }: { index: number }) => {
+      const image = images[index];
+      return image ? <Figure {...image} /> : null;
+    },
     InArticleAd: () => (adsEnabled ? <AdSlot placement="in-article" /> : null),
     // Never let content override the page's single H1.
     h1: (props: ComponentProps<"h2">) => <h2 {...props} />,
   };
 }
 
-export async function MdxContent({ source, adsEnabled }: { source: string; adsEnabled: boolean }) {
-  const prepared = adsEnabled ? injectInArticleAd(source) : source;
+export async function MdxContent({
+  source,
+  adsEnabled,
+  images = [],
+}: {
+  source: string;
+  adsEnabled: boolean;
+  images?: ArticleImage[];
+}) {
+  const withImages = injectArticleImages(source, images);
+  const prepared = adsEnabled ? injectInArticleAd(withImages) : withImages;
   return (
     <MDXRemote
       source={prepared}
-      components={buildComponents(adsEnabled)}
+      components={buildComponents(adsEnabled, images)}
       options={{
         disableImports: true,
         disableExports: true,
-        mdxOptions: { remarkPlugins: [remarkGfm], rehypePlugins: [rehypeSlug] },
+        // remarkSafeMdx strips {expressions}, unknown components and event handlers (content comes from the admin panel).
+        mdxOptions: { remarkPlugins: [remarkGfm, [remarkSafeMdx, { mode: "strip" }]], rehypePlugins: [rehypeSlug] },
       }}
     />
   );

@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 /**
- * Generates original, lightweight SVG cover art for every article that
- * doesn't already have one. Art is deterministic per slug and themed by category.
+ * Generates original, lightweight SVG cover art (the hero image) and in-article
+ * images for every article that doesn't already have them. Art is deterministic
+ * per file name and themed by category.
+ *
+ * In-article images are generated for `images` entries pointing at
+ * /images/articles/<slug>-<n>.svg.
  *
  *   npm run covers           # only missing covers
  *   npm run covers -- --force  # regenerate all
@@ -15,6 +19,7 @@ import matter from "gray-matter";
 
 const ARTICLES = "content/articles";
 const OUT = "public/images/covers";
+const INLINE_OUT = "public/images/articles";
 const force = process.argv.includes("--force");
 const W = 1600;
 const H = 900;
@@ -117,9 +122,11 @@ function motif(category, rand, [a, b, , light]) {
   return parts.join("\n  ");
 }
 
-function coverSvg(slug, category, alt) {
-  const rand = rng(slug);
-  const pal = palettes[category] ?? palettes.ai;
+function coverSvg(seed, category, alt, variant = 0) {
+  const rand = rng(seed);
+  const base = palettes[category] ?? palettes.ai;
+  // In-article variants swap the two accent colours so they don't look like copies of the cover.
+  const pal = variant % 2 ? [base[1], base[0], base[2], base[3]] : base;
   const [a, b, dark] = pal;
   const blobs = Array.from({ length: 3 }, (_, i) =>
     `<circle cx="${f(r(rand, 0, W))}" cy="${f(r(rand, 0, H))}" r="${f(r(rand, 280, 520))}" fill="url(#glow${i % 2})"/>`,
@@ -147,22 +154,37 @@ function coverSvg(slug, category, alt) {
 `;
 }
 
+async function exists(file) {
+  try {
+    await access(file);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 await mkdir(OUT, { recursive: true });
+await mkdir(INLINE_OUT, { recursive: true });
 const files = (await readdir(ARTICLES)).filter((f) => /\.mdx?$/.test(f));
 let written = 0;
 for (const file of files) {
   const slug = file.replace(/\.mdx?$/, "");
   const { data } = matter(await readFile(path.join(ARTICLES, file), "utf8"));
   const target = path.join(OUT, `${slug}.svg`);
-  if (!data.coverImage?.endsWith(`/images/covers/${slug}.svg`)) continue;
-  if (!force) {
-    try {
-      await access(target);
-      continue;
-    } catch {}
+  if (data.coverImage?.endsWith(`/images/covers/${slug}.svg`) && (force || !(await exists(target)))) {
+    await writeFile(target, coverSvg(slug, data.category, data.coverAlt ?? data.title));
+    written++;
+    console.log(`✓ ${target}`);
   }
-  await writeFile(target, coverSvg(slug, data.category, data.coverAlt ?? data.title));
-  written++;
-  console.log(`✓ ${target}`);
+
+  for (const image of data.images ?? []) {
+    const match = new RegExp(`^/images/articles/(${slug}-(\\d+))\\.svg$`).exec(image.src ?? "");
+    if (!match) continue;
+    const file = path.join(INLINE_OUT, `${match[1]}.svg`);
+    if (!force && (await exists(file))) continue;
+    await writeFile(file, coverSvg(match[1], data.category, image.alt, Number(match[2])));
+    written++;
+    console.log(`✓ ${file}`);
+  }
 }
-console.log(`${written} cover(s) generated.`);
+console.log(`${written} image(s) generated.`);

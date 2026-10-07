@@ -1,6 +1,7 @@
 import { Rss } from "lucide-react";
 import Link from "next/link";
 import { categoryList } from "@/lib/categories";
+import { ensureSiteData } from "@/lib/site-data";
 import { siteConfig } from "@/lib/site";
 import { Logo } from "./Logo";
 
@@ -21,7 +22,8 @@ function FooterColumn({ title, links }: { title: string; links: readonly { href:
   );
 }
 
-export function Footer() {
+export async function Footer() {
+  await ensureSiteData();
   const year = new Date().getFullYear();
   const categoryLinks = categoryList.map((c) => ({ href: `/category/${c.slug}`, label: c.name }));
 
@@ -38,9 +40,9 @@ export function Footer() {
             <Rss className="h-4 w-4" aria-hidden /> Subscribe via RSS
           </Link>
         </div>
-        <FooterColumn title="Categories" links={categoryLinks} />
-        <FooterColumn title="Explore" links={siteConfig.footer.explore} />
-        <FooterColumn title="BlogNest" links={siteConfig.footer.company} />
+        <FooterColumn title="Jobs" links={siteConfig.footer.jobs} />
+        <FooterColumn title="Read" links={categoryLinks} />
+                <FooterColumn title="Career Reads" links={siteConfig.footer.company} />
         <FooterColumn title="Legal" links={siteConfig.footer.legal} />
       </div>
       <div className="border-t border-border">
@@ -48,7 +50,7 @@ export function Footer() {
           <p>
             © {year} {siteConfig.name}. All rights reserved.
           </p>
-          <p>Independent editorial content. Advertising is always labeled.</p>
+          <p>Never pay to apply for a job. Advertising is always labeled.</p>
         </div>
       </div>
     </footer>

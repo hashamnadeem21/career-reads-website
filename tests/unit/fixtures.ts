@@ -17,6 +17,7 @@ export function makeArticle(overrides: Partial<Article> = {}): Article {
     coverAlt: "A sample cover image",
     coverWidth: 1600,
     coverHeight: 900,
+    images: [],
     noindex: false,
     ads: true,
     readingTimeMinutes: 3,

@@ -3,6 +3,7 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { getAllArticles, getArticleBySlug, setRepository } from "@/lib/content";
 import { MdxContentRepository, parseArticleFile } from "@/lib/content/mdx-repository";
+import { placeableSectionIds } from "@/lib/content/toc";
 import { isPubliclyVisible } from "@/lib/content/visibility";
 
 /**
@@ -25,6 +26,18 @@ describe("content integrity", async () => {
     expect(authors.some((au) => au.slug === article.author)).toBe(true);
     if (article.coverImage.startsWith("/")) {
       expect(existsSync(path.join(process.cwd(), "public", article.coverImage))).toBe(true);
+    }
+  });
+
+  it.each(articles.map((a) => [a.slug, a] as const))("%s has valid inline images", (_slug, article) => {
+    const sections = placeableSectionIds(article.content);
+    for (const image of article.images) {
+      if (image.src.startsWith("/")) {
+        expect(existsSync(path.join(process.cwd(), "public", image.src)), image.src).toBe(true);
+      }
+      if (image.placement.startsWith("section:")) {
+        expect(sections, `no heading "${image.placement}"`).toContain(image.placement.slice("section:".length));
+      }
     }
   });
 

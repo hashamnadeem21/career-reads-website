@@ -1,0 +1,24 @@
+{
+  "title": "SEO Content Writer",
+  "company": "Example Media",
+  "workModel": "remote",
+  "employmentType": "part-time",
+  "category": "marketing-content",
+  "experience": "entry",
+  "salary": "PKR 60,000 / month",
+  "summary": "Write clear, well-researched blog posts and guides that rank on search engines.",
+  "responsibilities": [
+    "Write 3–4 articles per week",
+    "Do keyword research",
+    "Update older posts"
+  ],
+  "requirements": [
+    "Excellent written English",
+    "Basic SEO knowledge"
+  ],
+  "postedAt": "2026-09-29",
+  "country": "Pakistan",
+  "status": "published",
+  "sample": true,
+  "applyEmail": "jobs@example.com"
+}

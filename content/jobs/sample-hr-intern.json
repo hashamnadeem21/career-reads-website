@@ -1,0 +1,23 @@
+{
+  "title": "HR Intern",
+  "company": "Example Group",
+  "city": "Karachi",
+  "workModel": "on-site",
+  "employmentType": "internship",
+  "category": "operations-admin",
+  "experience": "entry",
+  "salary": "PKR 30,000 / month stipend",
+  "summary": "A 3-month paid internship covering recruitment, onboarding, and HR records.",
+  "responsibilities": [
+    "Screen CVs and schedule interviews",
+    "Help with onboarding new staff"
+  ],
+  "requirements": [
+    "Final-year student or fresh graduate (BBA / HRM)"
+  ],
+  "postedAt": "2026-09-30",
+  "country": "Pakistan",
+  "status": "published",
+  "sample": true,
+  "applyEmail": "jobs@example.com"
+}

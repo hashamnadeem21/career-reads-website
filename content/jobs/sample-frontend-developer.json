@@ -1,0 +1,33 @@
+{
+  "title": "Frontend Developer (React / Next.js)",
+  "company": "Example Software House",
+  "city": "Lahore",
+  "workModel": "hybrid",
+  "employmentType": "full-time",
+  "category": "software-it",
+  "experience": "mid",
+  "salary": "PKR 150,000 – 220,000 / month",
+  "summary": "Build fast, accessible web interfaces with React and Next.js for a growing product team.",
+  "responsibilities": [
+    "Build and maintain user interfaces in React and Next.js",
+    "Work with designers to turn mockups into pages",
+    "Review code and write tests"
+  ],
+  "requirements": [
+    "2+ years of React experience",
+    "Good knowledge of TypeScript and CSS",
+    "Comfortable with Git"
+  ],
+  "benefits": [
+    "Health insurance",
+    "Flexible hours",
+    "Annual bonus"
+  ],
+  "featured": true,
+  "postedAt": "2026-10-01",
+  "deadline": "2027-12-31",
+  "country": "Pakistan",
+  "status": "published",
+  "sample": true,
+  "applyEmail": "jobs@example.com"
+}

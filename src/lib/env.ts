@@ -87,6 +87,10 @@ const serverSchema = z.object({
   CONTACT_FROM_EMAIL: optionalString,
   NEWSLETTER_WEBHOOK_URL: z.preprocess(emptyToUndefined, z.url().optional()),
   NEWSLETTER_WEBHOOK_SECRET: optionalString,
+  /** Postgres shared with the admin panel. Without it, content is read from `content/`. */
+  DATABASE_URL: z.preprocess(emptyToUndefined, z.string().regex(/^postgres(ql)?:\/\//).optional()),
+  /** Shared secret the admin panel sends to /api/revalidate. */
+  REVALIDATE_SECRET: z.preprocess(emptyToUndefined, z.string().min(16).optional()),
 });
 
 export type ServerEnv = z.infer<typeof serverSchema>;

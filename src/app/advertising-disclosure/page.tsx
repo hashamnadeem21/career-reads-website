@@ -5,7 +5,7 @@ import { POLICY_DATES } from "@/lib/policies";
 import { buildMetadata } from "@/lib/seo";
 
 const description =
-  "How BlogNest uses advertising, how ads are labeled, and how we keep advertising separate from editorial content.";
+  "How Career Reads uses advertising, how ads are labeled, and how we keep advertising separate from editorial content.";
 
 export const metadata: Metadata = buildMetadata({
   title: "Advertising disclosure",
@@ -23,7 +23,7 @@ export default function AdvertisingDisclosurePage() {
       lastUpdated={POLICY_DATES.advertising}
     >
       <p>
-        BlogNest is free to read. To support the site, we may display advertising. This page explains how that works.
+        Career Reads is free to read. To support the site, we may display advertising. This page explains how that works.
       </p>
 
       <h2>Display advertising</h2>

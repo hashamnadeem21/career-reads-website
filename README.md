@@ -1,4 +1,4 @@
-# BlogNest
+# Career Reads
 
 A fast, SEO-focused editorial blog built with **Next.js 16 (App Router)**, **TypeScript**, **Tailwind CSS 4**, **Motion (Framer Motion)**, and **MDX**. It publishes practical articles on technology, AI tools, productivity, travel, lifestyle, and personal development, and is prepared for **Google AdSense** monetization.
 
@@ -72,6 +72,7 @@ First time running e2e tests: `npx playwright install chromium`.
 content/
   articles/*.mdx          ← one file per article; file name = URL slug
   authors/*.json          ← author profiles (validated with Zod)
+  jobs/*.json             ← one file per job; file name = URL slug (/jobs/<slug>)
 public/
   brand/                  ← logo mark (SVG) and app icons
   images/covers/          ← article cover images
@@ -85,6 +86,7 @@ src/
     latest/ trending/ search/ authors/[slug]/
     about/ contact/ privacy-policy/ terms/ editorial-policy/
     corrections-policy/ advertising-disclosure/
+    jobs/ jobs/[slug]/    ← job listings with filters + job detail pages
     rss.xml/ ads.txt/     ← route handlers
     sitemap.ts robots.ts manifest.ts opengraph-image.tsx
     actions.ts            ← Server Actions (contact, newsletter)
@@ -135,6 +137,8 @@ All variables are documented in **[.env.example](.env.example)** and validated a
 | `CONTENT_PREVIEW_DRAFTS` | Dev only | Render drafts locally |
 | `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL` | Optional | Contact form delivery |
 | `NEWSLETTER_WEBHOOK_URL`, `NEWSLETTER_WEBHOOK_SECRET` | Optional | Newsletter signups |
+| `DATABASE_URL` | Optional | Postgres shared with the admin panel (`blognest-admin`). When set, articles, authors, jobs, categories and settings come from the database; otherwise from `content/` |
+| `REVALIDATE_SECRET` | With `DATABASE_URL` | Shared secret the admin panel uses to call `/api/revalidate` |
 
 `NEXT_PUBLIC_*` values are inlined at **build time** — redeploy after changing them. Never put secrets in `NEXT_PUBLIC_*` variables.
 
@@ -244,3 +248,10 @@ End-to-end tests (Playwright) build and start the production server, then test n
 ## Moving to a database / admin dashboard
 
 See **[docs/DATABASE.md](docs/DATABASE.md)**. Pages depend only on the service layer in `src/lib/content/index.ts`, which depends on the `ContentRepository` interface. Implement that interface against PostgreSQL, return it from `getRepository()`, and the site keeps working. The Zod schemas in `src/lib/content/schema.ts` remain the single source of truth for validation.
+
+## Jobs
+
+Each job is a JSON file in `content/jobs/`, validated by `src/lib/jobs/schema.ts`. Jobs are hidden after their `deadline`. Files with `"sample": true` are examples that show only in development, never in production.
+
+To manage jobs and posts from a web dashboard instead of files, follow `docs/ADMIN_PANEL_PLAN.md`.
+

@@ -1,5 +1,5 @@
 import GithubSlugger from "github-slugger";
-import type { TocItem } from "./schema";
+import type { ArticleImage, TocItem } from "./schema";
 
 /**
  * Extracts H2/H3 headings from markdown, skipping fenced code blocks.
@@ -63,4 +63,66 @@ export function injectInArticleAd(markdown: string, beforeHeading = 3, marker = 
     }
   }
   return markdown;
+}
+
+interface HeadingLine {
+  line: number;
+  depth: number;
+  id: string;
+}
+
+/** Every markdown heading (outside code fences) with its line number and rendered anchor id. */
+function headingLines(lines: string[]): HeadingLine[] {
+  const slugger = new GithubSlugger();
+  const headings: HeadingLine[] = [];
+  let inFence = false;
+  lines.forEach((rawLine, line) => {
+    if (/^\s*(```|~~~)/.test(rawLine)) {
+      inFence = !inFence;
+      return;
+    }
+    if (inFence) return;
+    const match = /^(#{1,6})\s+(.+?)\s*#*\s*$/.exec(rawLine.trimEnd());
+    if (match) headings.push({ line, depth: match[1].length, id: slugger.slug(stripInlineMarkdown(match[2])) });
+  });
+  return headings;
+}
+
+/**
+ * Returns the line index an image marker should be inserted at, or the end of
+ * the document when the article has no section headings. Unknown
+ * "section:<id>" placements fall back to "middle".
+ */
+export function resolveImageLine(lines: string[], placement: ArticleImage["placement"]): number {
+  const headings = headingLines(lines);
+  const h2 = headings.filter((h) => h.depth === 2);
+  if (h2.length === 0) return lines.length;
+
+  if (placement === "after-intro") return h2[0].line;
+  if (placement === "before-conclusion") return h2[h2.length - 1].line;
+  if (placement.startsWith("section:")) {
+    const target = headings.find((h) => h.id === placement.slice("section:".length));
+    if (target) return target.line + 1;
+  }
+  // "middle": directly under the heading of the middle section.
+  return h2[Math.floor((h2.length - 1) / 2)].line + 1;
+}
+
+/** Heading ids an image can be placed under, for validation and the admin picker. */
+export function placeableSectionIds(markdown: string): string[] {
+  return headingLines(markdown.split(/\r?\n/))
+    .filter((h) => h.depth === 2 || h.depth === 3)
+    .map((h) => h.id);
+}
+
+/** Inserts `<ArticleImage index={n} />` markers where each image belongs. */
+export function injectArticleImages(markdown: string, images: Pick<ArticleImage, "placement">[]): string {
+  if (images.length === 0) return markdown;
+  const lines = markdown.split(/\r?\n/);
+  const inserts = images
+    .map((image, index) => ({ index, at: resolveImageLine(lines, image.placement) }))
+    // Insert bottom-up so earlier line numbers stay valid; keep authoring order for ties.
+    .sort((a, b) => b.at - a.at || b.index - a.index);
+  for (const { index, at } of inserts) lines.splice(at, 0, "", `<ArticleImage index={${index}} />`, "");
+  return lines.join("\n");
 }

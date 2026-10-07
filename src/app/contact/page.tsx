@@ -6,13 +6,15 @@ import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { PageHeader } from "@/components/ui/SectionHeading";
 import { buildMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
+import { ensureSiteData } from "@/lib/site-data";
 
 const description =
-  "Contact the BlogNest editors with questions, feedback, corrections, or advertising and partnership enquiries.";
+  "Contact the Career Reads editors with questions, feedback, corrections, or advertising and partnership enquiries.";
 
 export const metadata: Metadata = buildMetadata({ title: "Contact us", description, path: "/contact" });
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  await ensureSiteData();
   return (
     <>
       <PageHeader eyebrow="Get in touch" title="Contact us" description={description}>

@@ -7,6 +7,7 @@ import { AdSlot } from "@/components/ads/AdSlot";
 import { ArticleGrid } from "@/components/article/ArticleGrid";
 import { CategoryBadge } from "@/components/article/ArticleCard";
 import { AuthorBox } from "@/components/article/AuthorBox";
+import { StatsBeacon } from "@/components/analytics/StatsBeacon";
 import { MdxContent } from "@/components/article/MdxContent";
 import { ShareButtons } from "@/components/article/ShareButtons";
 import { TableOfContents } from "@/components/article/TableOfContents";
@@ -14,6 +15,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { categories } from "@/lib/categories";
+import { hasDatabase } from "@/lib/db";
 import { getAllArticles, getArticleBySlug, getAuthor, getRelatedArticles } from "@/lib/content";
 import { articleJsonLd } from "@/lib/jsonld";
 import { absoluteUrl, siteConfig } from "@/lib/site";
@@ -74,6 +76,7 @@ export default async function ArticlePage({ params }: Props) {
 
   return (
     <>
+      {hasDatabase() && article.status === "published" && <StatsBeacon path={`/blog/${article.slug}`} />}
       {article.status !== "published" && (
         <div role="status" className="bg-amber-400 px-4 py-2 text-center text-sm font-semibold text-amber-950">
           Draft preview — this article is not published and is only visible in local development.
@@ -135,7 +138,7 @@ export default async function ArticlePage({ params }: Props) {
           <div className="mx-auto w-full min-w-0 max-w-3xl">
             <TableOfContents items={article.toc} variant="inline" />
             <div className="prose prose-lg prose-article max-w-none dark:prose-invert prose-headings:font-semibold prose-img:rounded-2xl">
-              <MdxContent source={article.content} adsEnabled={article.ads} />
+              <MdxContent source={article.content} adsEnabled={article.ads} images={article.images} />
             </div>
 
             <footer className="mt-12 space-y-8 border-t border-border pt-8">

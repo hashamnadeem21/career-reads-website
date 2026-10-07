@@ -1,4 +1,5 @@
 import { isProduction, publicEnv } from "@/lib/env";
+import { runtimeSettings } from "@/lib/settings";
 
 export type AdPlacement = "in-article" | "sidebar" | "below-article" | "listing";
 
@@ -14,21 +15,26 @@ export interface AdsConfig {
 /**
  * Ads are requested only when ALL of the following are true:
  *  - production build (`next build` / Vercel)
- *  - NEXT_PUBLIC_ADS_ENABLED=true
- *  - a valid NEXT_PUBLIC_ADSENSE_CLIENT_ID (ca-pub-…)
+ *  - ads switched on (admin Settings, or NEXT_PUBLIC_ADS_ENABLED=true)
+ *  - a valid AdSense client ID (admin Settings, or NEXT_PUBLIC_ADSENSE_CLIENT_ID)
  * Individual placements additionally need their slot ID.
+ *
+ * Values saved in the admin panel's Settings win; environment variables are the fallback.
  */
 export function getAdsConfig(): AdsConfig {
-  const clientId = publicEnv.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+  const saved = runtimeSettings().ads;
+  const clientId = saved?.clientId || publicEnv.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+  const slot = (placement: AdPlacement, fallback?: string) => saved?.slots[placement] || fallback;
   return {
-    enabled: isProduction && publicEnv.NEXT_PUBLIC_ADS_ENABLED && Boolean(clientId),
+    enabled: isProduction && (saved ? saved.enabled : publicEnv.NEXT_PUBLIC_ADS_ENABLED) && Boolean(clientId),
     clientId,
-    showPlaceholders: !isProduction && publicEnv.NEXT_PUBLIC_ADS_SHOW_PLACEHOLDERS,
+    // Placeholders from the admin are an explicit choice (visible to visitors); the env flag is dev-only.
+    showPlaceholders: saved ? saved.showPlaceholders : !isProduction && publicEnv.NEXT_PUBLIC_ADS_SHOW_PLACEHOLDERS,
     slots: {
-      "in-article": publicEnv.NEXT_PUBLIC_ADSENSE_SLOT_IN_ARTICLE,
-      sidebar: publicEnv.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR,
-      "below-article": publicEnv.NEXT_PUBLIC_ADSENSE_SLOT_BELOW_ARTICLE,
-      listing: publicEnv.NEXT_PUBLIC_ADSENSE_SLOT_LISTING,
+      "in-article": slot("in-article", publicEnv.NEXT_PUBLIC_ADSENSE_SLOT_IN_ARTICLE),
+      sidebar: slot("sidebar", publicEnv.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR),
+      "below-article": slot("below-article", publicEnv.NEXT_PUBLIC_ADSENSE_SLOT_BELOW_ARTICLE),
+      listing: slot("listing", publicEnv.NEXT_PUBLIC_ADSENSE_SLOT_LISTING),
     },
   };
 }

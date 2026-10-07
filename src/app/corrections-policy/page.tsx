@@ -4,7 +4,7 @@ import { StaticPage } from "@/components/ui/StaticPage";
 import { POLICY_DATES } from "@/lib/policies";
 import { buildMetadata } from "@/lib/seo";
 
-const description = "How to report an error on BlogNest and how we review, correct, and disclose mistakes in our articles.";
+const description = "How to report an error on Career Reads and how we review, correct, and disclose mistakes in our articles.";
 
 export const metadata: Metadata = buildMetadata({ title: "Corrections policy", description, path: "/corrections-policy" });
 

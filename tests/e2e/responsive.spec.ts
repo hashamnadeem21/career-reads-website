@@ -1,6 +1,9 @@
 import { expect, test } from "@playwright/test";
 
-for (const path of ["/", "/blog", "/blog/fix-slow-home-wifi", "/contact", "/search?q=travel", "/privacy-policy"]) {
+// Phone-sized viewport: checks overflow and the mobile menu where they matter.
+test.use({ viewport: { width: 390, height: 844 } });
+
+for (const path of ["/", "/jobs", "/blog", "/blog/fix-slow-home-wifi", "/contact", "/search?q=travel", "/privacy-policy"]) {
   test(`no horizontal overflow on ${path}`, async ({ page }) => {
     await page.goto(path);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);

@@ -3,6 +3,7 @@
 import { domAnimation, LazyMotion, MotionConfig } from "motion/react";
 import { ThemeProvider } from "next-themes";
 import type { ReactNode } from "react";
+import { SmoothScroll } from "./SmoothScroll";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -11,6 +12,7 @@ export function Providers({ children }: { children: ReactNode }) {
       <LazyMotion features={domAnimation} strict>
         <MotionConfig reducedMotion="user">{children}</MotionConfig>
       </LazyMotion>
+      <SmoothScroll />
     </ThemeProvider>
   );
 }

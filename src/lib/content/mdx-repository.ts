@@ -5,6 +5,7 @@ import readingTime from "reading-time";
 import { z } from "zod";
 import type { ContentRepository } from "./repository";
 import { articleFrontmatterSchema, authorSchema, SLUG_PATTERN, type Article, type Author } from "./schema";
+import { isCategorySlug } from "@/lib/categories";
 import { extractToc } from "./toc";
 
 export class ContentValidationError extends Error {
@@ -23,6 +24,9 @@ export function parseArticleFile(fileName: string, source: string): Article {
   const { data, content } = matter(source);
   const parsed = articleFrontmatterSchema.safeParse(data);
   if (!parsed.success) throw new ContentValidationError(fileName, parsed.error);
+  if (!isCategorySlug(parsed.data.category)) {
+    throw new Error(`Invalid content in ${fileName}: unknown category "${parsed.data.category}".`);
+  }
 
   const stats = readingTime(content);
   return {
