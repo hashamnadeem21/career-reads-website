@@ -77,7 +77,7 @@ export const publicEnv = {
 };
 
 /** Where the live site reads its content when API_URL isn't set on a production deployment. */
-export const PRODUCTION_API_URL = "https://api-careersreads.com";
+export const PRODUCTION_API_URL = "https://api.careersreads.com";
 
 export const isProduction = process.env.NODE_ENV === "production";
 

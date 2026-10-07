@@ -137,7 +137,7 @@ All variables are documented in **[.env.example](.env.example)** and validated a
 | `CONTENT_PREVIEW_DRAFTS` | Dev only | Render drafts locally |
 | `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL` | Optional | Contact form delivery |
 | `NEWSLETTER_WEBHOOK_URL`, `NEWSLETTER_WEBHOOK_SECRET` | Optional | Newsletter signups |
-| `API_URL` | Optional | The Career Reads API (`blognest-api`), e.g. `http://localhost:4000`. Production deployments (`VERCEL_ENV=production`) default to `https://api-careersreads.com`. When set, articles, authors, jobs, categories and settings come from it; otherwise from `content/` |
+| `API_URL` | Optional | The Career Reads API (`blognest-api`), e.g. `http://localhost:4000`. Production deployments (`VERCEL_ENV=production`) default to `https://api.careersreads.com`. When set, articles, authors, jobs, categories and settings come from it; otherwise from `content/` |
 | `SITE_API_KEY` | With `API_URL` | Sent as `X-Api-Key`; same value as `SITE_API_KEY` in the API. Needed for the contact form, newsletter, page counters and draft previews |
 | `REVALIDATE_SECRET` | With `API_URL` | Shared secret the API uses to call `/api/revalidate` after saves |
 
