@@ -76,6 +76,9 @@ export const publicEnv = {
   NEXT_PUBLIC_SITE_URL: parsedPublic.data.NEXT_PUBLIC_SITE_URL.replace(/\/+$/, ""),
 };
 
+/** Where the live site reads its content when API_URL isn't set on a production deployment. */
+export const PRODUCTION_API_URL = "https://api-careersreads.com";
+
 export const isProduction = process.env.NODE_ENV === "production";
 
 const serverSchema = z.object({
@@ -87,9 +90,12 @@ const serverSchema = z.object({
   CONTACT_FROM_EMAIL: optionalString,
   NEWSLETTER_WEBHOOK_URL: z.preprocess(emptyToUndefined, z.url().optional()),
   NEWSLETTER_WEBHOOK_SECRET: optionalString,
-  /** The Career Reads API (blognest-api), e.g. http://localhost:4000. Without it, content is read from `content/`. */
+  /**
+   * The Career Reads API (blognest-api), e.g. http://localhost:4000. Without it, content is read
+   * from `content/`, except on Vercel production deployments, which default to PRODUCTION_API_URL.
+   */
   API_URL: z.preprocess(
-    emptyToUndefined,
+    (v) => emptyToUndefined(v) ?? (process.env.VERCEL_ENV === "production" ? PRODUCTION_API_URL : undefined),
     z
       .url()
       .optional()
