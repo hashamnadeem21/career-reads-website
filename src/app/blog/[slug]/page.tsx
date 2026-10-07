@@ -15,7 +15,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { categories } from "@/lib/categories";
-import { hasDatabase } from "@/lib/db";
+import { hasApi } from "@/lib/api/client";
 import { getAllArticles, getArticleBySlug, getAuthor, getRelatedArticles } from "@/lib/content";
 import { articleJsonLd } from "@/lib/jsonld";
 import { absoluteUrl, siteConfig } from "@/lib/site";
@@ -76,7 +76,7 @@ export default async function ArticlePage({ params }: Props) {
 
   return (
     <>
-      {hasDatabase() && article.status === "published" && <StatsBeacon path={`/blog/${article.slug}`} />}
+      {hasApi() && article.status === "published" && <StatsBeacon path={`/blog/${article.slug}`} />}
       {article.status !== "published" && (
         <div role="status" className="bg-amber-400 px-4 py-2 text-center text-sm font-semibold text-amber-950">
           Draft preview — this article is not published and is only visible in local development.

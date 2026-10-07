@@ -26,8 +26,11 @@ const nextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
     // Add your CDN / CMS image hosts here when you move away from local images.
-    // Images uploaded in the admin panel are stored on Vercel Blob.
-    remotePatterns: [{ protocol: "https", hostname: "*.public.blob.vercel-storage.com" }],
+    // Images uploaded in the admin panel are stored on the API server (older ones on Vercel Blob).
+    remotePatterns: [
+      { protocol: "https", hostname: "api.careersreads.com", pathname: "/uploads/**" },
+      { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
+    ],
   },
   async headers() {
     return [

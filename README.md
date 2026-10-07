@@ -4,7 +4,7 @@ A fast, SEO-focused editorial blog built with **Next.js 16 (App Router)**, **Typ
 
 - Server Components by default; client JavaScript only for the theme toggle, mobile menu, forms, copy-link, scroll reveals, and ad units.
 - Static generation with hourly ISR (`revalidate = 3600`) for every content page.
-- A storage-agnostic content layer: MDX files today, PostgreSQL later — without touching pages.
+- A storage-agnostic content layer: MDX files, or the Career Reads API (managed in the admin panel), without touching pages.
 
 > **Before you launch:** the bundled articles are original *demo content*. Review, rewrite, or replace them with your own expertise before applying for AdSense, and add real author profiles. AdSense approval and search rankings are never guaranteed.
 
@@ -26,7 +26,7 @@ A fast, SEO-focused editorial blog built with **Next.js 16 (App Router)**, **Typ
 12. [Forms: contact & newsletter](#forms-contact--newsletter)
 13. [Testing](#testing)
 14. [Performance & accessibility](#performance--accessibility)
-15. [Moving to a database / admin dashboard](#moving-to-a-database--admin-dashboard)
+15. [Content from the API / admin dashboard](#content-from-the-api--admin-dashboard)
 
 ---
 
@@ -103,7 +103,7 @@ src/
 tests/
   unit/                   ← Vitest
   e2e/                    ← Playwright
-docs/                     ← AdSense, publishing, and database guides
+docs/                     ← AdSense, publishing, and content-source guides
 ```
 
 ## Publishing articles
@@ -137,8 +137,9 @@ All variables are documented in **[.env.example](.env.example)** and validated a
 | `CONTENT_PREVIEW_DRAFTS` | Dev only | Render drafts locally |
 | `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL` | Optional | Contact form delivery |
 | `NEWSLETTER_WEBHOOK_URL`, `NEWSLETTER_WEBHOOK_SECRET` | Optional | Newsletter signups |
-| `DATABASE_URL` | Optional | Postgres shared with the admin panel (`blognest-admin`). When set, articles, authors, jobs, categories and settings come from the database; otherwise from `content/` |
-| `REVALIDATE_SECRET` | With `DATABASE_URL` | Shared secret the admin panel uses to call `/api/revalidate` |
+| `API_URL` | Optional | The Career Reads API (`blognest-api`), e.g. `http://localhost:4000`. Production deployments (`VERCEL_ENV=production`) default to `https://api.careersreads.com`. When set, articles, authors, jobs, categories and settings come from it; otherwise from `content/` |
+| `SITE_API_KEY` | With `API_URL` | Sent as `X-Api-Key`; same value as `SITE_API_KEY` in the API. Needed for the contact form, newsletter, page counters and draft previews |
+| `REVALIDATE_SECRET` | With `API_URL` | Shared secret the API uses to call `/api/revalidate` after saves |
 
 `NEXT_PUBLIC_*` values are inlined at **build time** — redeploy after changing them. Never put secrets in `NEXT_PUBLIC_*` variables.
 
@@ -245,9 +246,9 @@ End-to-end tests (Playwright) build and start the production server, then test n
 - Skip link, visible focus styles, keyboard-operable menus (Escape closes, focus returns), labeled forms with `aria-invalid` / `aria-describedby`, `aria-current` on navigation, and text colors chosen for WCAG AA contrast in both themes.
 - Theme toggle renders identical markup on server and client (no hydration mismatch, no flash).
 
-## Moving to a database / admin dashboard
+## Content from the API / admin dashboard
 
-See **[docs/DATABASE.md](docs/DATABASE.md)**. Pages depend only on the service layer in `src/lib/content/index.ts`, which depends on the `ContentRepository` interface. Implement that interface against PostgreSQL, return it from `getRepository()`, and the site keeps working. The Zod schemas in `src/lib/content/schema.ts` remain the single source of truth for validation.
+See **[docs/DATABASE.md](docs/DATABASE.md)**. Pages depend only on the service layer in `src/lib/content/index.ts` and `src/lib/jobs/index.ts`. With `API_URL` set, content comes from the Career Reads API (edited in the admin panel); without it, from the files in `content/`. The website never connects to a database. Local start order: Postgres → API (:4000) → website (:3000) → admin (:3001).
 
 ## Jobs
 

@@ -1,28 +1,31 @@
 import "server-only";
-import { asc } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
-import { categories as categoriesTable } from "@/db/schema";
+import { apiGet, apiPath, hasApi } from "@/lib/api/client";
 import { replaceCategories } from "@/lib/categories";
-import { getDb } from "@/lib/db";
 import { replaceJobCategories } from "@/lib/jobs/categories";
 
+interface CategoryRow {
+  slug: string;
+  kind: "blog" | "job";
+  name: string;
+  headline: string | null;
+  description: string;
+  accent: string | null;
+}
+
 const loadCategoryRows = unstable_cache(
-  async () => {
-    const db = getDb();
-    if (!db) return [];
-    return db.select().from(categoriesTable).orderBy(asc(categoriesTable.sortOrder), asc(categoriesTable.name));
-  },
-  ["db-categories"],
+  async () => (await apiGet<CategoryRow[]>(apiPath("/public/categories"))) ?? [],
+  ["api-categories"],
   { tags: ["categories"], revalidate: 3600 },
 );
 
 /**
- * Loads categories from the database (when configured) into the in-memory
+ * Loads categories from the API (when configured) into the in-memory
  * category lists. Call it before reading `categories` / `jobCategories`.
- * Without a database, or if it fails, the built-in typed lists stay active.
+ * Without the API, or if it fails, the built-in typed lists stay active.
  */
 export async function ensureCategories(): Promise<void> {
-  if (!getDb()) return;
+  if (!hasApi()) return;
   try {
     const rows = await loadCategoryRows();
     replaceCategories(
@@ -40,6 +43,6 @@ export async function ensureCategories(): Promise<void> {
       rows.filter((r) => r.kind === "job").map((r) => ({ slug: r.slug, name: r.name, description: r.description })),
     );
   } catch (error) {
-    console.error("Could not load categories from the database; using the built-in lists.", error);
+    console.error("Could not load categories from the API; using the built-in lists.", error);
   }
 }

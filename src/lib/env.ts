@@ -76,6 +76,9 @@ export const publicEnv = {
   NEXT_PUBLIC_SITE_URL: parsedPublic.data.NEXT_PUBLIC_SITE_URL.replace(/\/+$/, ""),
 };
 
+/** Where the live site reads its content when API_URL isn't set on a production deployment. */
+export const PRODUCTION_API_URL = "https://api.careersreads.com";
+
 export const isProduction = process.env.NODE_ENV === "production";
 
 const serverSchema = z.object({
@@ -87,9 +90,20 @@ const serverSchema = z.object({
   CONTACT_FROM_EMAIL: optionalString,
   NEWSLETTER_WEBHOOK_URL: z.preprocess(emptyToUndefined, z.url().optional()),
   NEWSLETTER_WEBHOOK_SECRET: optionalString,
-  /** Postgres shared with the admin panel. Without it, content is read from `content/`. */
-  DATABASE_URL: z.preprocess(emptyToUndefined, z.string().regex(/^postgres(ql)?:\/\//).optional()),
-  /** Shared secret the admin panel sends to /api/revalidate. */
+  /**
+   * The Career Reads API (blognest-api), e.g. http://localhost:4000. Without it, content is read
+   * from `content/`, except on Vercel production deployments, which default to PRODUCTION_API_URL.
+   */
+  API_URL: z.preprocess(
+    (v) => emptyToUndefined(v) ?? (process.env.VERCEL_ENV === "production" ? PRODUCTION_API_URL : undefined),
+    z
+      .url()
+      .optional()
+      .transform((v) => v?.replace(/\/+$/, "")),
+  ),
+  /** Sent to the API as X-Api-Key (form submissions, stats, draft previews). Same value as SITE_API_KEY there. */
+  SITE_API_KEY: optionalString,
+  /** Shared secret the API sends to /api/revalidate after saves. */
   REVALIDATE_SECRET: z.preprocess(emptyToUndefined, z.string().min(16).optional()),
 });
 

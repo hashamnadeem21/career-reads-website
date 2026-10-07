@@ -1,7 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
-import { CACHE_TAGS } from "@/lib/db";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 import { serverEnv } from "@/lib/env";
 
 /**
