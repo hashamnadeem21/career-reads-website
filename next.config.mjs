@@ -48,6 +48,13 @@ const nextConfig = {
   async redirects() {
     // Avoid duplicate URLs: page 1 of any paginated listing lives at the base URL.
     return [
+      // One canonical host: careersreads.com → www (the API only refreshes the www cache after edits).
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "careersreads.com" }],
+        destination: "https://www.careersreads.com/:path*",
+        permanent: true,
+      },
       { source: "/blog/page/1", destination: "/blog", permanent: true },
       { source: "/category/:category/page/1", destination: "/category/:category", permanent: true },
       { source: "/feed", destination: "/rss.xml", permanent: true },
