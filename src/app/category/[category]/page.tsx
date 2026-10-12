@@ -7,7 +7,6 @@ import { loadCategoryPage } from "@/lib/listing";
 import { buildMetadata } from "@/lib/seo";
 
 export const revalidate = 3600;
-export const dynamicParams = false;
 
 type Props = { params: Promise<{ category: string }> };
 
