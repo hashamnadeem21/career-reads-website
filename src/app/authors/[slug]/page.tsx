@@ -9,7 +9,6 @@ import { buildMetadata } from "@/lib/seo";
 import { absoluteUrl } from "@/lib/site";
 
 export const revalidate = 3600;
-export const dynamicParams = false;
 
 type Props = { params: Promise<{ slug: string }> };
 
