@@ -21,10 +21,20 @@ const booleanFlag = z.preprocess(
     .transform((v) => v === "true" || v === "1"),
 );
 
+/** The live site's address and API. Production builds use them unless the variable is set. */
+export const PRODUCTION_SITE_URL = "https://www.careersreads.com";
+export const PRODUCTION_API_URL = "https://api.careersreads.com";
+
+/**
+ * True for `next build` / `next start` (on any host, not only Vercel). An unset variable falls back
+ * to the production value; setting it, even to an empty string, opts out (the e2e suite does that).
+ */
+export const isProduction = process.env.NODE_ENV === "production";
+
 const publicSchema = z.object({
   NEXT_PUBLIC_SITE_URL: z.preprocess(
     emptyToUndefined,
-    z.url().default("http://localhost:3000"),
+    z.url().default(isProduction ? PRODUCTION_SITE_URL : "http://localhost:3000"),
   ),
   NEXT_PUBLIC_GA_MEASUREMENT_ID: z.preprocess(
     emptyToUndefined,
@@ -76,11 +86,6 @@ export const publicEnv = {
   NEXT_PUBLIC_SITE_URL: parsedPublic.data.NEXT_PUBLIC_SITE_URL.replace(/\/+$/, ""),
 };
 
-/** Where the live site reads its content when API_URL isn't set on a production deployment. */
-export const PRODUCTION_API_URL = "https://api.careersreads.com";
-
-export const isProduction = process.env.NODE_ENV === "production";
-
 const serverSchema = z.object({
   GOOGLE_SITE_VERIFICATION: optionalString,
   BING_SITE_VERIFICATION: optionalString,
@@ -91,11 +96,12 @@ const serverSchema = z.object({
   NEWSLETTER_WEBHOOK_URL: z.preprocess(emptyToUndefined, z.url().optional()),
   NEWSLETTER_WEBHOOK_SECRET: optionalString,
   /**
-   * The Career Reads API (blognest-api), e.g. http://localhost:4000. Without it, content is read
-   * from `content/`, except on Vercel production deployments, which default to PRODUCTION_API_URL.
+   * The Career Reads API (blognest-api), e.g. http://localhost:4000. Production builds default to
+   * PRODUCTION_API_URL when it's unset; when it's empty (or unset in development), content is read
+   * from `content/`.
    */
   API_URL: z.preprocess(
-    (v) => emptyToUndefined(v) ?? (process.env.VERCEL_ENV === "production" ? PRODUCTION_API_URL : undefined),
+    (v) => (v === undefined && isProduction ? PRODUCTION_API_URL : emptyToUndefined(v)),
     z
       .url()
       .optional()
