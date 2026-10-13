@@ -183,9 +183,22 @@
     transform: none;
   }
 }
+/* Gentle bobbing for the chips floating over the hero scene. */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
 @media (prefers-reduced-motion: no-preference) {
   .animate-rise {
     animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
   }
 }
 

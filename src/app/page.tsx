@@ -1,32 +1,47 @@
 import {
   ArrowRight,
+  ArrowUpRight,
   BadgeCheck,
+  Building2,
   CalendarClock,
-  ChevronDown,
   Code,
+  Compass,
   ExternalLink,
   GraduationCap,
+  Hash,
   Laptop,
+  MapPin,
+  Rocket,
   Search,
   ShieldCheck,
+  type LucideIcon,
 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { FeaturedBento } from "@/components/home/FeaturedBento";
+import { HeroModels } from "@/components/home/HeroModels";
+import { HomeFaq, type HomeFaqItem } from "@/components/home/HomeFaq";
 import { KeyLearnings } from "@/components/home/KeyLearnings";
 import { NewsletterBand } from "@/components/home/NewsletterBand";
 import { TopicIndex } from "@/components/home/TopicIndex";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { categoryList } from "@/lib/categories";
-import { getArticleSummaries, getCategoryCounts, getEditorsPicks, getFeaturedArticles, getTrendingArticles } from "@/lib/content";
+import { categories, categoryList } from "@/lib/categories";
+import {
+  getArticleSummaries,
+  getCategoryCounts,
+  getEditorsPicks,
+  getFeaturedArticles,
+  getTopicTags,
+  getTrendingArticles,
+} from "@/lib/content";
 import { getJobCategoryCounts, getJobs } from "@/lib/jobs";
-import { jobCategoryList } from "@/lib/jobs/categories";
-import { faqPageJsonLd, itemListJsonLd, type FaqItem } from "@/lib/jsonld";
+import { jobCategories, jobCategoryList } from "@/lib/jobs/categories";
+import { faqPageJsonLd, itemListJsonLd } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
-import { formatDate } from "@/lib/utils";
+import { formatDate, humanizeTag } from "@/lib/utils";
 
 export const revalidate = 3600;
 
@@ -37,10 +52,11 @@ export const metadata: Metadata = buildMetadata({
   absoluteTitle: true,
 });
 
-const shortcuts = [
-  { href: "/jobs?model=remote", label: "Remote jobs", icon: Laptop },
-  { href: "/jobs?type=internship", label: "Internships", icon: GraduationCap },
-  { href: "/jobs?category=software-it", label: "Software & IT", icon: Code },
+/** Shortcut chips that float over the 3D scene. */
+const floatingChips = [
+  { href: "/jobs?model=remote", label: "Remote jobs", icon: Laptop, className: "left-0 top-[14%]", delay: "0s" },
+  { href: "/jobs?type=internship", label: "Internships", icon: GraduationCap, className: "right-0 top-[44%]", delay: "1.2s" },
+  { href: "/jobs?category=software-it", label: "Software & IT", icon: Code, className: "bottom-[8%] left-[10%]", delay: "2.4s" },
 ];
 
 const principles = [
@@ -68,8 +84,19 @@ const principles = [
   },
 ];
 
+/** Groups values and counts them, most common first. */
+function tally(values: string[]): { name: string; count: number }[] {
+  const counts = new Map<string, number>();
+  for (const v of values) counts.set(v, (counts.get(v) ?? 0) + 1);
+  return [...counts.entries()]
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+}
+
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+
 export default async function HomePage() {
-  const [jobs, jobCounts, allArticles, articleCounts, featured, editorsPicks, trending] = await Promise.all([
+  const [jobs, jobCounts, allArticles, articleCounts, featured, editorsPicks, trending, topicTags] = await Promise.all([
     getJobs(),
     getJobCategoryCounts(),
     getArticleSummaries(),
@@ -77,12 +104,16 @@ export default async function HomePage() {
     getFeaturedArticles(3),
     getEditorsPicks(12),
     getTrendingArticles(),
+    getTopicTags(14),
   ]);
 
   // getJobs() already sorts featured first, then newest.
   const featuredJobs = jobs.slice(0, 4);
   const remoteCount = jobs.filter((job) => job.workModel === "remote").length;
   const internshipCount = jobs.filter((job) => job.employmentType === "internship").length;
+  const entryCount = jobs.filter((job) => job.experience === "entry").length;
+  const cities = tally(jobs.filter((job) => job.city).map((job) => job.city!)).slice(0, 8);
+  const companies = tally(jobs.map((job) => job.company)).slice(0, 12);
 
   // Learnings come from guides not already featured above, curated picks first.
   const featuredSlugs = new Set(featured.map((a) => a.slug));
@@ -99,39 +130,117 @@ export default async function HomePage() {
   const stats = [
     { label: "Open jobs", value: jobs.length, href: "/jobs" },
     { label: "Remote roles", value: remoteCount, href: "/jobs?model=remote" },
+    { label: "Internships", value: internshipCount, href: "/jobs?type=internship" },
     { label: "Guides", value: allArticles.length, href: "/blog" },
     { label: "Topics", value: categoryList.length, href: "/blog" },
   ];
 
+  // Starting points. Category links are dropped if that category was removed in the admin panel.
+  const hasTopic = (slug: string) => categoryList.some((c) => c.slug === slug);
+  const hasJobCategory = (slug: string) => jobCategoryList.some((c) => c.slug === slug);
+  const paths: { icon: LucideIcon; title: string; body: string; links: { href: string; label: string }[] }[] = [
+    {
+      icon: Rocket,
+      title: "Starting your career",
+      body: "First roles, internships, and the habits that help you learn fast once you land one.",
+      links: [
+        { href: "/jobs?type=internship", label: `Internships (${internshipCount})` },
+        { href: "/jobs?experience=entry", label: `Entry-level jobs (${entryCount})` },
+        ...(hasTopic("personal-development")
+          ? [{ href: "/category/personal-development", label: `${categories["personal-development"].name} guides` }]
+          : []),
+      ],
+    },
+    {
+      icon: Laptop,
+      title: "Working remotely",
+      body: "Roles you can do from anywhere, and guides on focus, routines, and a workspace that works.",
+      links: [
+        { href: "/jobs?model=remote", label: `Remote jobs (${remoteCount})` },
+        ...(hasTopic("productivity") ? [{ href: "/category/productivity", label: `${categories.productivity.name} guides` }] : []),
+        ...(hasTopic("lifestyle") ? [{ href: "/category/lifestyle", label: `${categories.lifestyle.name} guides` }] : []),
+      ],
+    },
+    {
+      icon: Code,
+      title: "Building tech and AI skills",
+      body: "Software and IT openings, plus plain-language guides on the tools changing how work gets done.",
+      links: [
+        ...(hasJobCategory("software-it")
+          ? [{ href: "/jobs?category=software-it", label: `${jobCategories["software-it"].name} jobs (${jobCounts["software-it"] ?? 0})` }]
+          : []),
+        ...(hasTopic("ai") ? [{ href: "/category/ai", label: `${categories.ai.name} guides` }] : []),
+        ...(hasTopic("technology") ? [{ href: "/category/technology", label: `${categories.technology.name} guides` }] : []),
+      ],
+    },
+  ];
+
   const summary = `${siteConfig.name} is an independent site that lists current job openings in tech, business, design, and more, and publishes practical guides on technology, AI, productivity, travel, and everyday life. You apply to jobs directly with the employer, and listings are removed once their deadline passes.`;
 
-  const faqs: (FaqItem & { link?: { href: string; label: string } })[] = [
-    { question: `What is ${siteConfig.name}?`, answer: summary },
+  const faqs: HomeFaqItem[] = [
+    { group: "site", question: `What is ${siteConfig.name}?`, answer: summary },
     {
+      group: "jobs",
       question: `How do I apply for a job on ${siteConfig.name}?`,
       answer:
         "Open the job and use its apply button. It takes you to the employer's own application page or opens an email to them, so your application goes straight to the employer.",
       link: { href: "/jobs", label: "Browse open jobs" },
     },
     {
+      group: "jobs",
+      question: "Should I ever pay to apply for a job?",
+      answer:
+        "No. Legitimate employers don't charge you to apply or to be interviewed. If a listing asks you for money, don't pay, and tell us about it through the contact page.",
+      link: { href: "/contact", label: "Report a listing" },
+    },
+    {
+      group: "jobs",
       question: "How up to date are the job listings?",
       answer:
         "Listings refresh automatically within the hour. Each job shows the date it was posted, and a job is taken down once its last day to apply has passed.",
     },
     {
+      group: "jobs",
       question: "Can I find remote jobs and internships?",
-      answer: `Yes. Right now there ${remoteCount === 1 ? "is 1 remote role" : `are ${remoteCount} remote roles`} and ${
-        internshipCount === 1 ? "1 internship" : `${internshipCount} internships`
-      } listed. Use the filters on the jobs page to narrow by work model, job type, category, and experience level.`,
+      answer: `Yes. Right now there ${remoteCount === 1 ? "is 1 remote role" : `are ${remoteCount} remote roles`} and ${plural(
+        internshipCount,
+        "internship",
+        "internships",
+      )} listed. Use the filters on the jobs page to narrow by work model, job type, category, and experience level.`,
       link: { href: "/jobs?model=remote", label: "See remote jobs" },
     },
+    ...(cities.length > 0
+      ? [
+          {
+            group: "jobs" as const,
+            question: "Which cities have jobs listed right now?",
+            answer: `Right now: ${cities.map((c) => `${c.name} (${c.count})`).join(", ")}${
+              remoteCount > 0 ? `, plus ${plural(remoteCount, "remote role", "remote roles")}` : ""
+            }. Type a city into the job search to see only the jobs there.`,
+          },
+        ]
+      : []),
     {
+      group: "site",
       question: `Who writes the guides on ${siteConfig.name}?`,
       answer:
         "Our editorial team researches each guide against primary sources where possible, edits it for clarity and accuracy, and updates it when the facts change.",
       link: { href: "/editorial-policy", label: "Read our editorial policy" },
     },
     {
+      group: "site",
+      question: "Do you use AI to write the guides?",
+      answer:
+        "Writers may use AI tools for brainstorming, outlining, or checking clarity. A human editor is responsible for every published guide, verifies facts independently, and makes all editorial decisions. We don't publish unreviewed AI-generated content.",
+    },
+    {
+      group: "site",
+      question: "How do I find a guide on a specific topic?",
+      answer: `Search the guides by keyword, or browse by topic: ${categoryList.map((c) => c.name).join(", ")}.`,
+      link: { href: "/search", label: "Search the guides" },
+    },
+    {
+      group: "site",
       question: "How can I get new guides by email?",
       answer:
         "Sign up for the weekly newsletter at the bottom of this page. It's one email a week, and you can unsubscribe in one click.",
@@ -150,26 +259,29 @@ export default async function HomePage() {
         ]}
       />
 
-      {/* Hero: answer-first summary + search on the left, live numbers on the right */}
-      <section className="relative overflow-hidden border-b border-border">
+      {/* Hero: answer-first summary + search on the left, 3D scene on the right */}
+      <section className="relative overflow-hidden">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_at_30%_20%,black,transparent_70%)]"
         />
-        <div className="container-page relative grid gap-10 py-12 sm:py-16 lg:grid-cols-12 lg:gap-12 lg:py-20">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_78%_45%,color-mix(in_oklab,var(--brand)_14%,transparent),transparent_55%)]"
+        />
+        <div className="container-page relative grid items-center gap-8 py-12 sm:py-16 lg:grid-cols-12 lg:gap-10 lg:py-20">
           <div className="lg:col-span-7">
-            <p className="animate-rise eyebrow">Jobs · Guides · Learnings</p>
+            <p className="animate-rise inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1 text-xs font-semibold text-link">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden /> Jobs · Guides · Learnings
+            </p>
             <h1
-              className="animate-rise mt-4 font-display text-4xl font-bold leading-[1.05] tracking-tight text-balance sm:text-5xl lg:text-6xl"
+              className="animate-rise mt-5 font-display text-4xl font-bold leading-[1.05] tracking-tight text-balance sm:text-5xl lg:text-6xl"
               style={{ animationDelay: "80ms" }}
             >
               Latest jobs and <span className="text-gradient">practical guides</span>, in one place.
             </h1>
 
-            <div
-              className="animate-rise mt-8 max-w-2xl border-l-4 border-brand pl-5"
-              style={{ animationDelay: "160ms" }}
-            >
+            <div className="animate-rise mt-8 max-w-2xl border-l-4 border-brand pl-5" style={{ animationDelay: "160ms" }}>
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">In short</p>
               <p className="mt-2 text-lg leading-relaxed">{summary}</p>
             </div>
@@ -206,53 +318,93 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <aside
-            aria-labelledby="at-a-glance"
-            className="animate-rise self-start rounded-3xl bg-navy p-6 ring-1 ring-white/10 text-white shadow-2xl shadow-blue-900/20 sm:p-8 lg:col-span-5"
-            style={{ animationDelay: "200ms" }}
-          >
-            <h2 id="at-a-glance" className="text-xs font-semibold uppercase tracking-[0.14em] text-white/60">
+          <div className="relative mx-auto aspect-square w-full max-w-[24rem] sm:max-w-md lg:col-span-5 lg:max-w-none">
+            <HeroModels className="absolute inset-0 h-full w-full" />
+            {floatingChips.map(({ href, label, icon: Icon, className, delay }) => (
+              <Link
+                key={href}
+                href={href}
+                style={{ animationDelay: delay }}
+                className={`animate-float absolute hidden items-center gap-2 rounded-xl border border-border bg-background/85 px-3 py-2 text-sm font-semibold shadow-lg shadow-blue-500/10 backdrop-blur hover:border-brand hover:text-link sm:inline-flex ${className}`}
+              >
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-surface-strong text-link" aria-hidden>
+                  <Icon className="h-4 w-4" />
+                </span>
+                {label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* At a glance: live numbers from the same data the pages use */}
+      <section aria-labelledby="at-a-glance" className="border-y border-white/10 bg-navy text-white dark:border-border dark:bg-surface">
+        <div className="container-page flex flex-col gap-6 py-8 lg:flex-row lg:items-center lg:gap-10">
+          <div className="shrink-0">
+            <h2 id="at-a-glance" className="text-xs font-semibold uppercase tracking-[0.14em] text-sky-300">
               At a glance
             </h2>
-            <dl className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-white/10">
-              {stats.map(({ label, value, href }) => (
-                <div key={label} className="relative bg-navy p-4 transition-colors hover:bg-white/5">
-                  <dt className="text-sm text-white/70">
-                    <Link href={href} className="after:absolute after:inset-0">
-                      {label}
-                    </Link>
-                  </dt>
-                  <dd className="mt-1 font-display text-4xl font-semibold tabular-nums">{value}</dd>
-                </div>
-              ))}
-            </dl>
             {lastUpdated && (
-              <p className="mt-5 flex items-center gap-2 text-sm text-white/70">
-                <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden />
-                Last updated <time dateTime={lastUpdated}>{formatDate(lastUpdated)}</time>
+              <p className="mt-2 flex items-center gap-2 text-sm text-white/70">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" aria-hidden />
+                Updated <time dateTime={lastUpdated}>{formatDate(lastUpdated)}</time>
               </p>
             )}
-            <nav aria-label="Job shortcuts" className="mt-6 border-t border-white/10 pt-6">
-              <ul className="flex flex-wrap gap-2">
-                {shortcuts.map(({ href, label, icon: Icon }) => (
-                  <li key={href}>
-                    <Link
-                      href={href}
-                      className="inline-flex items-center gap-2 rounded-full border border-white/15 px-3.5 py-1.5 text-sm font-medium hover:border-white/40 hover:bg-white/10"
-                    >
-                      <Icon className="h-4 w-4 text-sky-300" aria-hidden />
-                      {label}
+          </div>
+          <dl className="grid flex-1 grid-cols-2 gap-px overflow-hidden rounded-2xl bg-white/10 sm:grid-cols-5">
+            {stats.map(({ label, value, href }) => (
+              <div key={label} className="relative bg-navy px-5 py-4 transition-colors hover:bg-white/5 dark:bg-surface">
+                <dt className="text-sm text-white/70">
+                  <Link href={href} className="after:absolute after:inset-0">
+                    {label}
+                  </Link>
+                </dt>
+                <dd className="mt-1 font-display text-3xl font-semibold tabular-nums">{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      {/* Start here: three common goals, each with its jobs and guides */}
+      <section aria-labelledby="start-here" className="container-page py-16">
+        <SectionHeading
+          id="start-here"
+          eyebrow="Start here"
+          title="Pick a path"
+          description="Three common goals, each with the jobs and guides that go with it."
+        />
+        <ul className="grid gap-5 md:grid-cols-3">
+          {paths.map(({ icon: Icon, title, body, links }, i) => (
+            <li
+              key={title}
+              className="group relative overflow-hidden rounded-3xl border border-border bg-background p-6 transition duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-xl hover:shadow-blue-500/10"
+            >
+              <span aria-hidden className="absolute right-5 top-4 font-display text-6xl font-bold text-surface-strong">
+                {i + 1}
+              </span>
+              <span className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-brand-2 text-white shadow-lg shadow-blue-500/25" aria-hidden>
+                <Icon className="h-6 w-6" />
+              </span>
+              <h3 className="relative mt-5 font-display text-xl font-semibold">{title}</h3>
+              <p className="relative mt-2 text-sm leading-relaxed text-muted">{body}</p>
+              <ul className="relative mt-5 space-y-1 border-t border-border pt-4">
+                {links.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="flex items-center justify-between rounded-lg px-2 py-1.5 text-sm font-medium hover:bg-surface hover:text-link">
+                      {link.label}
+                      <ArrowRight className="h-4 w-4 text-muted" aria-hidden />
                     </Link>
                   </li>
                 ))}
               </ul>
-            </nav>
-          </aside>
-        </div>
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* Featured: one lead guide, two more, and the featured jobs */}
-      <section aria-labelledby="featured" className="container-page py-16">
+      <section aria-labelledby="featured" className="container-page pb-16">
         <SectionHeading
           id="featured"
           eyebrow="Featured"
@@ -281,11 +433,92 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* Where the jobs are + who is hiring */}
+      {jobs.length > 0 && (
+        <section aria-labelledby="hiring" className="container-page py-16">
+          <SectionHeading
+            id="hiring"
+            eyebrow="Hiring now"
+            title="Where the jobs are, and who's hiring"
+            description="Cities and companies with open roles on the site today."
+            href="/jobs"
+            linkLabel="All open jobs"
+          />
+          <div className="grid gap-6 lg:grid-cols-5">
+            <div className="rounded-3xl border border-border p-6 lg:col-span-2">
+              <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-muted">
+                <MapPin className="h-4 w-4 text-link" aria-hidden /> Jobs by city
+              </h3>
+              <ul className="mt-4 space-y-3">
+                {cities.map(({ name, count }) => (
+                  <li key={name}>
+                    <Link href={`/jobs?q=${encodeURIComponent(name)}`} className="group block">
+                      <span className="flex items-baseline justify-between text-sm">
+                        <span className="font-medium group-hover:text-link">{name}</span>
+                        <span className="tabular-nums text-muted">{plural(count, "job", "jobs")}</span>
+                      </span>
+                      <span className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-surface-strong" aria-hidden>
+                        <span
+                          className="block h-full rounded-full bg-gradient-to-r from-brand to-brand-2"
+                          style={{ width: `${Math.max(8, (count / cities[0].count) * 100)}%` }}
+                        />
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+                {remoteCount > 0 && (
+                  <li>
+                    <Link href="/jobs?model=remote" className="flex items-center justify-between rounded-xl bg-surface-strong px-3 py-2 text-sm font-semibold text-link">
+                      <span className="inline-flex items-center gap-2">
+                        <Laptop className="h-4 w-4" aria-hidden /> Remote, work from anywhere
+                      </span>
+                      <span className="tabular-nums">{remoteCount}</span>
+                    </Link>
+                  </li>
+                )}
+              </ul>
+            </div>
+            <div className="rounded-3xl border border-border p-6 lg:col-span-3">
+              <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-muted">
+                <Building2 className="h-4 w-4 text-link" aria-hidden /> Companies hiring
+              </h3>
+              <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                {companies.map(({ name, count }) => (
+                  <li key={name}>
+                    <Link
+                      href={`/jobs?q=${encodeURIComponent(name)}`}
+                      className="group flex items-center gap-3 rounded-2xl border border-border p-3 transition-colors hover:border-brand"
+                    >
+                      <span
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-surface-strong to-surface font-display text-sm font-bold text-link"
+                        aria-hidden
+                      >
+                        {name
+                          .split(/\s+/)
+                          .slice(0, 2)
+                          .map((w) => w[0])
+                          .join("")
+                          .toUpperCase()}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-semibold group-hover:text-link">{name}</span>
+                        <span className="text-xs text-muted">{plural(count, "open role", "open roles")}</span>
+                      </span>
+                      <ArrowUpRight className="h-4 w-4 shrink-0 text-muted transition group-hover:rotate-45 group-hover:text-link" aria-hidden />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+      )}
+
       <div className="container-page">
         <AdSlot placement="listing" />
       </div>
 
-      {/* Topic index: every hub page with real counts */}
+      {/* Topic index: every hub page with real counts, plus popular tags */}
       <section aria-labelledby="explore" className="container-page py-16">
         <SectionHeading
           id="explore"
@@ -315,6 +548,26 @@ export default async function HomePage() {
             }))}
           />
         </div>
+        {topicTags.length > 0 && (
+          <div className="mt-12 rounded-3xl bg-surface p-6 sm:p-8">
+            <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-muted">
+              <Compass className="h-4 w-4 text-link" aria-hidden /> Popular in our guides
+            </h3>
+            <ul className="mt-4 flex flex-wrap gap-2">
+              {topicTags.map(({ tag }) => (
+                <li key={tag}>
+                  <Link
+                    href={`/search?q=${encodeURIComponent(humanizeTag(tag))}`}
+                    className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-3.5 py-1.5 text-sm font-medium capitalize hover:border-brand hover:text-link"
+                  >
+                    <Hash className="h-3.5 w-3.5 text-muted" aria-hidden />
+                    {humanizeTag(tag)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </section>
 
       {/* How it works: the trust signals behind the listings and guides */}
@@ -345,37 +598,8 @@ export default async function HomePage() {
       </section>
 
       {/* FAQ: mirrored in the FAQPage JSON-LD above */}
-      <section aria-labelledby="faq" className="container-page grid gap-10 py-16 lg:grid-cols-12">
-        <div className="lg:col-span-4">
-          <p className="eyebrow mb-2">FAQ</p>
-          <h2 id="faq" className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-            Frequently asked questions
-          </h2>
-          <p className="mt-3 text-muted">
-            Still have a question?{" "}
-            <Link href="/contact" className="font-semibold text-link hover:underline">
-              Contact the editors
-            </Link>
-            .
-          </p>
-        </div>
-        <div className="divide-y divide-border border-y border-border lg:col-span-8">
-          {faqs.map(({ question, answer, link }) => (
-            <details key={question} className="group py-5">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold [&::-webkit-details-marker]:hidden">
-                <h3>{question}</h3>
-                <ChevronDown className="h-5 w-5 shrink-0 text-muted transition-transform group-open:rotate-180" aria-hidden />
-              </summary>
-              <p className="mt-3 leading-relaxed text-muted">{answer}</p>
-              {link && (
-                <Link href={link.href} className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-link hover:underline">
-                  {link.label}
-                  <ArrowRight className="h-4 w-4" aria-hidden />
-                </Link>
-              )}
-            </details>
-          ))}
-        </div>
+      <section aria-labelledby="faq" className="container-page py-16">
+        <HomeFaq items={faqs} />
       </section>
 
       <div className="pb-16">
