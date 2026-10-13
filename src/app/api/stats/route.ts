@@ -4,17 +4,21 @@ import { rateLimit } from "@/lib/forms/rate-limit";
 
 /**
  * POST /api/stats  { path: "/blog/<slug>" | "/jobs/<slug>", kind: "view" | "apply_click" }
+ *                  { path: "/", kind: "visit" }  (someone opened the site, once per tab session)
  *
  * Forwards the hit to the API, which adds 1 to today's counter for that page. Only counts
  * per page per day are stored: no cookies, no IP addresses, no user agents, no personal data.
  * The visitor's IP and user agent are passed along for rate limiting and bot filtering only.
  */
-const bodySchema = z
-  .object({
-    path: z.string().regex(/^\/(blog|jobs)\/[a-z0-9]+(?:-[a-z0-9]+)*$/),
-    kind: z.enum(["view", "apply_click"]),
-  })
-  .strict();
+const bodySchema = z.union([
+  z
+    .object({
+      path: z.string().regex(/^\/(blog|jobs)\/[a-z0-9]+(?:-[a-z0-9]+)*$/),
+      kind: z.enum(["view", "apply_click"]),
+    })
+    .strict(),
+  z.object({ path: z.literal("/"), kind: z.literal("visit") }).strict(),
+]);
 
 const BOT_PATTERN = /bot|crawl|spider|slurp|bingpreview|facebookexternalhit|embedly|quora link preview|lighthouse|pingdom|uptime/i;
 
