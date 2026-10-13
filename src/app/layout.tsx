@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { SiteTracker } from "@/components/analytics/StatsBeacon";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { Providers } from "@/components/layout/Providers";
@@ -92,6 +93,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         </Providers>
         <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
         <GoogleAnalytics />
+        <SiteTracker />
       </body>
     </html>
   );
