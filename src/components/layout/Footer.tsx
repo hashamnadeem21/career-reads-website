@@ -5,6 +5,10 @@ import { ensureSiteData } from "@/lib/site-data";
 import { siteConfig } from "@/lib/site";
 import { Logo } from "./Logo";
 
+/**
+ * Footer links aren't prefetched: every page shows ~20 of them, and prefetching them all at once
+ * overloaded the host (503s that turned into failed navigations). They load on click instead.
+ */
 function FooterColumn({ title, links }: { title: string; links: readonly { href: string; label: string }[] }) {
   return (
     <div>
@@ -12,7 +16,7 @@ function FooterColumn({ title, links }: { title: string; links: readonly { href:
       <ul className="mt-4 space-y-2.5">
         {links.map((link) => (
           <li key={link.href}>
-            <Link href={link.href} className="text-sm text-muted transition-colors hover:text-link">
+            <Link href={link.href} prefetch={false} className="text-sm text-muted transition-colors hover:text-link">
               {link.label}
             </Link>
           </li>
@@ -35,6 +39,7 @@ export async function Footer() {
           <p className="mt-4 text-sm leading-relaxed text-muted">{siteConfig.description}</p>
           <Link
             href="/rss.xml"
+            prefetch={false}
             className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-link hover:underline"
           >
             <Rss className="h-4 w-4" aria-hidden /> Subscribe via RSS
