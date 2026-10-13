@@ -20,8 +20,9 @@ describe("contactSchema", () => {
   it("accepts valid messages", () => {
     expect(contactSchema.safeParse(valid).success).toBe(true);
   });
-  it("rejects short messages, unknown topics and link spam", () => {
-    expect(contactSchema.safeParse({ ...valid, message: "short" }).success).toBe(false);
+  it("accepts short messages; rejects empty ones, unknown topics and link spam", () => {
+    expect(contactSchema.safeParse({ ...valid, message: "Hi" }).success).toBe(true);
+    expect(contactSchema.safeParse({ ...valid, message: "   " }).success).toBe(false);
     expect(contactSchema.safeParse({ ...valid, topic: "crypto" }).success).toBe(false);
     const spam = `${valid.message} ${"https://spam.example ".repeat(4)}`;
     expect(contactSchema.safeParse({ ...valid, message: spam }).success).toBe(false);
@@ -29,11 +30,11 @@ describe("contactSchema", () => {
 });
 
 describe("spam timing", () => {
-  it("flags missing, too-fast and stale submissions", () => {
+  it("flags missing and too-fast submissions, never slow ones", () => {
     const now = 1_000_000_000;
     expect(isSuspiciousTiming(undefined, now)).toBe(true);
     expect(isSuspiciousTiming(now - 500, now)).toBe(true);
-    expect(isSuspiciousTiming(now - 2 * 86_400_000, now)).toBe(true);
+    expect(isSuspiciousTiming(now - 2 * 86_400_000, now)).toBe(false);
     expect(isSuspiciousTiming(now - 10_000, now)).toBe(false);
   });
 });

@@ -22,8 +22,21 @@ function formValues(formData: FormData, fields: string[]): Record<string, string
   return Object.fromEntries(fields.map((f) => [f, String(formData.get(f) ?? "")]));
 }
 
-/** Bots get the same success message as humans so they learn nothing. */
+/** Bots that fill the honeypot get the same success message as humans so they learn nothing. */
 const silentSuccess = (message: string): FormState => ({ status: "success", message });
+
+/** Sent too fast (or before the page was ready): ask a human to try again instead of dropping it. */
+const tooFast = (values: Record<string, string>): FormState => ({
+  status: "error",
+  message: "That was quick! Please press the button again to send.",
+  values,
+});
+
+/**
+ * Saving to the admin inbox is what counts. Only when no API is configured (`stored` is null)
+ * does a successful email or webhook delivery count instead.
+ */
+const handedOff = (stored: boolean | null, delivered: boolean) => (stored === null ? delivered : stored);
 
 export async function subscribeToNewsletter(_prev: FormState, formData: FormData): Promise<FormState> {
   const values = formValues(formData, ["email"]);
@@ -35,15 +48,14 @@ export async function subscribeToNewsletter(_prev: FormState, formData: FormData
     if (fieldErrors.company) return silentSuccess(successMessage);
     return { status: "error", message: "Please fix the highlighted fields.", fieldErrors, values };
   }
-  if (isSuspiciousTiming(parsed.data.startedAt)) return silentSuccess(successMessage);
+  if (isSuspiciousTiming(parsed.data.startedAt)) return tooFast(values);
   if (!rateLimit(await clientKey("newsletter"), 5, RATE_WINDOW_MS).allowed) {
     return { status: "error", message: "Too many attempts. Please try again in a few minutes.", values };
   }
 
   // Saved for the admin inbox (when the API is configured) and sent to the newsletter webhook.
   const [stored, delivered] = await Promise.all([storeSubscriber(parsed.data.email, await visitorIp()), deliverNewsletterSignup(parsed.data.email)]);
-  const ok = stored === true || delivered;
-  return ok
+  return handedOff(stored, delivered)
     ? silentSuccess(successMessage)
     : { status: "error", message: "Something went wrong. Please try again later.", values };
 }
@@ -58,15 +70,14 @@ export async function sendContactMessage(_prev: FormState, formData: FormData): 
     if (fieldErrors.company) return silentSuccess(successMessage);
     return { status: "error", message: "Please fix the highlighted fields.", fieldErrors, values };
   }
-  if (isSuspiciousTiming(parsed.data.startedAt)) return silentSuccess(successMessage);
+  if (isSuspiciousTiming(parsed.data.startedAt)) return tooFast(values);
   if (!rateLimit(await clientKey("contact"), 3, RATE_WINDOW_MS).allowed) {
     return { status: "error", message: "Too many messages. Please try again in a few minutes.", values };
   }
 
   // Saved to the admin inbox (when the API is configured) and emailed when delivery is set up.
   const [stored, delivered] = await Promise.all([storeContactMessage(parsed.data, await visitorIp()), deliverContactMessage(parsed.data)]);
-  const ok = stored === true || delivered;
-  return ok
+  return handedOff(stored, delivered)
     ? silentSuccess(successMessage)
     : { status: "error", message: "We couldn't send your message. Please email us directly.", values };
 }
