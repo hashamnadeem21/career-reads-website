@@ -41,10 +41,10 @@ test("contact form validates fields server-side", async ({ page }) => {
   const form = page.getByTestId("contact-form");
   await form.getByLabel("Name").fill("A");
   await form.getByLabel("Email").fill("reader@example.com");
-  await form.getByLabel("Message").fill("Too short");
+  await form.getByLabel("Message").fill("   ");
   await form.getByRole("button", { name: "Send message" }).click();
   await expect(form.getByText("Please enter your name.")).toBeVisible();
-  await expect(form.getByText("Please write at least 20 characters.")).toBeVisible();
+  await expect(form.getByText("Please write your message.")).toBeVisible();
   await expect(form.getByLabel("Email")).toHaveValue("reader@example.com");
   await expect(form.getByLabel("Name")).toHaveAttribute("aria-invalid", "true");
 });

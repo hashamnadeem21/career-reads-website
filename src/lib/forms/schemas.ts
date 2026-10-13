@@ -30,7 +30,7 @@ export const contactSchema = spamGuardSchema.extend({
   message: z
     .string()
     .trim()
-    .min(20, "Please write at least 20 characters.")
+    .min(1, "Please write your message.")
     .max(5000, "Please keep your message under 5,000 characters.")
     .refine((m) => (m.match(/https?:\/\//gi) ?? []).length <= 3, "Please include no more than three links."),
 });
@@ -40,10 +40,13 @@ export type ContactInput = z.infer<typeof contactSchema>;
 
 /** Minimum time a human plausibly needs to fill a form. */
 export const MIN_FILL_MS = 2500;
-const MAX_FILL_MS = 24 * 60 * 60 * 1000;
 
+/**
+ * True when the form was sent before the page was ready (no start time) or faster than a person
+ * could fill it. The visitor is asked to press Send again rather than silently dropped.
+ */
 export function isSuspiciousTiming(startedAt: number | undefined, now = Date.now()): boolean {
   if (!startedAt) return true;
   const elapsed = now - startedAt;
-  return elapsed < MIN_FILL_MS || elapsed > MAX_FILL_MS;
+  return elapsed < MIN_FILL_MS;
 }
