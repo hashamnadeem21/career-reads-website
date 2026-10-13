@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { CalendarClock } from "lucide-react";
 import { PageHeader } from "@/components/ui/SectionHeading";
 import { formatDate } from "@/lib/utils";
 
@@ -21,18 +21,19 @@ export function StaticPage({
 }) {
   return (
     <>
-      <PageHeader eyebrow={eyebrow} title={title} description={description}>
-        <div className="mt-8">
-          <Breadcrumbs items={[{ name: title, path }]} />
-        </div>
-      </PageHeader>
+      <PageHeader
+        eyebrow={eyebrow}
+        title={title}
+        description={description}
+        crumbs={[{ name: title, path }]}
+        facts={
+          lastUpdated
+            ? [{ icon: CalendarClock, label: <>Last updated <time dateTime={lastUpdated}>{formatDate(lastUpdated)}</time></> }]
+            : undefined
+        }
+      />
       <div className="container-page py-12">
         <div className="prose prose-lg prose-article mx-auto max-w-3xl dark:prose-invert">
-          {lastUpdated && (
-            <p className="text-sm text-muted">
-              Last updated: <time dateTime={lastUpdated}>{formatDate(lastUpdated)}</time>
-            </p>
-          )}
           {children}
         </div>
       </div>

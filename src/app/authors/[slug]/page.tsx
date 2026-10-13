@@ -6,7 +6,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { getArticlesByAuthor, getAuthor, getAuthors } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, siteConfig } from "@/lib/site";
 
 export const revalidate = 3600;
 
@@ -20,8 +20,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const author = await getAuthor((await params).slug);
   if (!author) return {};
   return buildMetadata({
-    title: `${author.name} — ${author.role}`,
-    description: author.bio.slice(0, 160),
+    title: author.name.includes(siteConfig.name) ? author.name : `${author.name}, ${author.role}`,
+    description: author.bio,
     path: `/authors/${author.slug}`,
   });
 }

@@ -1,8 +1,7 @@
-import { Info } from "lucide-react";
+import { Flame, Info, UserCheck } from "lucide-react";
 import type { Metadata } from "next";
 import { ArticleGrid } from "@/components/article/ArticleGrid";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { PageHeader } from "@/components/ui/SectionHeading";
 import { getTrendingArticles } from "@/lib/content";
 import { collectionPageJsonLd } from "@/lib/jsonld";
@@ -20,11 +19,17 @@ export default async function TrendingPage() {
   const articles = await getTrendingArticles();
   return (
     <>
-      <PageHeader eyebrow="Editor-curated" title={title} description={description}>
-        <div className="mt-8">
-          <Breadcrumbs items={[{ name: "Trending", path: "/trending" }]} />
-        </div>
-      </PageHeader>
+      <PageHeader
+        eyebrow="Editor-curated"
+        title={title}
+        highlight="Trending"
+        description={description}
+        crumbs={[{ name: "Trending", path: "/trending" }]}
+        facts={[
+          { icon: Flame, label: `${articles.length} picks` },
+          { icon: UserCheck, label: "Chosen by our editors" },
+        ]}
+      />
       <div className="container-page py-12">
         <p className="mb-10 flex items-start gap-2 rounded-2xl bg-surface p-4 text-sm text-muted">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-link" aria-hidden />

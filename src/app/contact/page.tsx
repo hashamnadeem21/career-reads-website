@@ -2,7 +2,6 @@ import { Mail, MessageSquareText, PenLine } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ContactForm } from "@/components/forms/ContactForm";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { PageHeader } from "@/components/ui/SectionHeading";
 import { buildMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
@@ -11,17 +10,19 @@ import { ensureSiteData } from "@/lib/site-data";
 const description =
   "Contact the Career Reads editors with questions, feedback, corrections, or advertising and partnership enquiries.";
 
-export const metadata: Metadata = buildMetadata({ title: "Contact us", description, path: "/contact" });
+export const metadata: Metadata = buildMetadata({ title: "Contact the Career Reads team", description, path: "/contact" });
 
 export default async function ContactPage() {
   await ensureSiteData();
   return (
     <>
-      <PageHeader eyebrow="Get in touch" title="Contact us" description={description}>
-        <div className="mt-8">
-          <Breadcrumbs items={[{ name: "Contact", path: "/contact" }]} />
-        </div>
-      </PageHeader>
+      <PageHeader
+        eyebrow="Get in touch"
+        title="Contact the Career Reads team"
+        highlight="Career Reads"
+        description={description}
+        crumbs={[{ name: "Contact", path: "/contact" }]}
+      />
       <div className="container-page grid gap-12 py-12 lg:grid-cols-[1fr_1.4fr]">
         <div className="space-y-6">
           {[

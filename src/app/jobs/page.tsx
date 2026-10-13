@@ -1,10 +1,11 @@
-import { Search } from "lucide-react";
+import { Briefcase, CalendarClock, GraduationCap, Laptop, Search } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { JobList } from "@/components/jobs/JobCard";
-import { PageHeader } from "@/components/ui/SectionHeading";
-import { filterJobs, getJobs, type JobFilters } from "@/lib/jobs";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { PageHeader, type HeroFact } from "@/components/ui/SectionHeading";
+import { filterJobs, getJobs, type Job, type JobFilters } from "@/lib/jobs";
 import {
   EMPLOYMENT_TYPES,
   EXPERIENCE_LEVELS,
@@ -17,7 +18,9 @@ import {
   workModelLabels,
 } from "@/lib/jobs/categories";
 import { ensureSiteData } from "@/lib/site-data";
-import { absoluteUrl } from "@/lib/site";
+import { collectionPageJsonLd, itemListJsonLd } from "@/lib/jsonld";
+import { absoluteUrl, siteConfig } from "@/lib/site";
+import { formatDate } from "@/lib/utils";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 type Props = { searchParams: Promise<SearchParams> };
@@ -43,14 +46,31 @@ async function parseFilters(params: SearchParams): Promise<JobFilters> {
   };
 }
 
+/** "Pakistan" when every listing is in one country, so the page can say where the jobs are. */
+function soleCountry(jobs: Job[]): string | undefined {
+  const countries = new Set(jobs.map((j) => j.country));
+  return countries.size === 1 ? [...countries][0] : undefined;
+}
+
+function jobsHeadline(jobs: Job[], filters: JobFilters): string {
+  if (filters.category) return `${jobCategories[filters.category].name} jobs`;
+  const country = soleCountry(jobs);
+  return country ? `Latest jobs in ${country}` : "Latest jobs";
+}
+
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const filters = await parseFilters(await searchParams);
   const filtered = Object.values(filters).some(Boolean);
-  const category = filters.category ? jobCategories[filters.category] : undefined;
+  const jobs = await getJobs();
+  const country = soleCountry(jobs);
+  const title = jobsHeadline(jobs, filters);
+  const description = `Browse current jobs${country ? ` in ${country}` : ""} and remote roles in tech, design, marketing, sales, finance, support, and more. Apply directly with the employer.`;
   return {
-    title: category ? `${category.name} jobs` : "Latest jobs",
-    description: "Browse the latest jobs in tech, design, marketing, sales, finance, support, and more.",
+    title,
+    description,
     alternates: { canonical: absoluteUrl("/jobs") },
+    openGraph: { type: "website", url: absoluteUrl("/jobs"), title, description },
+    twitter: { card: "summary_large_image", title, description },
     // Filtered views are variations of /jobs and should not be indexed separately.
     ...(filtered && { robots: { index: false, follow: true } }),
   };
@@ -61,12 +81,42 @@ const selectClass =
 
 export default async function JobsPage({ searchParams }: Props) {
   const filters = await parseFilters(await searchParams);
-  const jobs = filterJobs(await getJobs(), filters);
+  const allJobs = await getJobs();
+  const jobs = filterJobs(allJobs, filters);
   const hasFilters = Object.values(filters).some(Boolean);
+
+  const country = soleCountry(allJobs);
+  const headline = jobsHeadline(allJobs, filters);
+  const remoteCount = allJobs.filter((j) => j.workModel === "remote").length;
+  const internshipCount = allJobs.filter((j) => j.employmentType === "internship").length;
+  const lastPosted = allJobs.map((j) => j.postedAt).sort().at(-1);
+  const summary = `${siteConfig.name} lists current openings${country ? ` in ${country}` : ""} and remote roles across tech, business, design, and more. Every job links to the employer's own application page or email, and a listing comes down once its last day to apply has passed.`;
+  const facts: HeroFact[] = [
+    { icon: Briefcase, label: `${allJobs.length} open ${allJobs.length === 1 ? "job" : "jobs"}` },
+    ...(remoteCount ? [{ icon: Laptop, label: `${remoteCount} remote` }] : []),
+    ...(internshipCount ? [{ icon: GraduationCap, label: `${internshipCount} ${internshipCount === 1 ? "internship" : "internships"}` }] : []),
+    ...(lastPosted ? [{ icon: CalendarClock, label: <>Last posted <time dateTime={lastPosted}>{formatDate(lastPosted)}</time></> }] : []),
+  ];
 
   return (
     <>
-      <PageHeader title="Find jobs" description="Fresh openings in tech, business, design, support, and more. Updated regularly.">
+      {!hasFilters && (
+        <JsonLd
+          data={[
+            collectionPageJsonLd(headline, summary, "/jobs"),
+            itemListJsonLd(headline, allJobs.map((j) => `/jobs/${j.slug}`)),
+          ]}
+        />
+      )}
+      <PageHeader
+        eyebrow="Jobs board"
+        title={headline}
+        highlight={country ?? (filters.category ? undefined : "Latest jobs")}
+        description={summary}
+        summary={hasFilters ? undefined : summary}
+        crumbs={[{ name: "Jobs", path: "/jobs" }]}
+        facts={facts}
+      >
         <form action="/jobs" method="get" role="search" className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-[2fr_repeat(4,1fr)_auto]">
           <div className="relative sm:col-span-2 lg:col-span-1">
             <label htmlFor="jobs-q" className="sr-only">

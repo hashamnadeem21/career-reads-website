@@ -12,6 +12,7 @@ import { hasApi } from "@/lib/api/client";
 import { getJobBySlug, getJobs, getRelatedJobs, jobLocation, type Job } from "@/lib/jobs";
 import { employmentTypeLabels, experienceLabels, jobCategories, workModelLabels } from "@/lib/jobs/categories";
 import { jobPostingJsonLd } from "@/lib/jsonld";
+import { metaDescription, pageTitle } from "@/lib/seo";
 import { absoluteUrl } from "@/lib/site";
 import { formatDate } from "@/lib/utils";
 
@@ -26,12 +27,16 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const job = await getJobBySlug((await params).slug);
   if (!job) return { title: "Job not found", robots: { index: false } };
-  const title = `${job.title} at ${job.company}`;
+  // "Frontend Developer at Acme in Lahore, Pakistan": the role, the employer and the place people search for.
+  const title = `${job.title} at ${job.company} in ${jobLocation(job)}`;
+  const description = metaDescription(job.summary);
+  const url = absoluteUrl(`/jobs/${job.slug}`);
   return {
-    title,
-    description: job.summary,
-    alternates: { canonical: absoluteUrl(`/jobs/${job.slug}`) },
-    openGraph: { type: "website", url: absoluteUrl(`/jobs/${job.slug}`), title, description: job.summary },
+    title: pageTitle(title),
+    description,
+    alternates: { canonical: url },
+    openGraph: { type: "website", url, title, description },
+    twitter: { card: "summary_large_image", title, description },
     ...(job.sample && { robots: { index: false, follow: false } }),
   };
 }

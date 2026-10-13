@@ -36,6 +36,7 @@ export default async function CategoryPage({ params }: Props) {
     <BlogListing
       eyebrow={`Category · ${category.name}`}
       title={category.headline}
+      highlight={category.headline.includes(category.name) ? category.name : undefined}
       description={category.description}
       basePath={`/category/${category.slug}`}
       result={result}
