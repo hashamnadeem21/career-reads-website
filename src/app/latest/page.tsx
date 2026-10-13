@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { ArticleCard } from "@/components/article/ArticleCard";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { BookOpen, CalendarClock } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { PageHeader } from "@/components/ui/SectionHeading";
 import { getLatestArticles, type ArticleSummary } from "@/lib/content";
 import { collectionPageJsonLd } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/seo";
+import { formatDate } from "@/lib/utils";
 
 export const revalidate = 3600;
 
@@ -34,11 +35,19 @@ export default async function LatestPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Fresh off the press" title={title} description={description}>
-        <div className="mt-8">
-          <Breadcrumbs items={[{ name: "Latest", path: "/latest" }]} />
-        </div>
-      </PageHeader>
+      <PageHeader
+        eyebrow="Fresh off the press"
+        title={title}
+        highlight="Latest"
+        description={description}
+        crumbs={[{ name: "Latest", path: "/latest" }]}
+        facts={[
+          { icon: BookOpen, label: `${articles.length} newest guides` },
+          ...(articles[0]
+            ? [{ icon: CalendarClock, label: <>Last published <time dateTime={articles[0].publishedAt}>{formatDate(articles[0].publishedAt)}</time></> }]
+            : []),
+        ]}
+      />
       <div className="container-page py-12">
         {groups.map(([month, items], gi) => (
           <section key={month} aria-labelledby={`month-${gi}`} className="mb-14">

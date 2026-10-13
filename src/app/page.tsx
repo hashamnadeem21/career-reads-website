@@ -2,6 +2,8 @@ import {
   ArrowRight,
   ArrowUpRight,
   BadgeCheck,
+  BookOpen,
+  Briefcase,
   Building2,
   CalendarClock,
   Code,
@@ -19,6 +21,7 @@ import {
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AdSlot } from "@/components/ads/AdSlot";
+import { AtAGlance, type GlanceStat } from "@/components/home/AtAGlance";
 import { FeaturedBento } from "@/components/home/FeaturedBento";
 import { HeroGlobe } from "@/components/home/HeroGlobe";
 import { HomeFaq, type HomeFaqItem } from "@/components/home/HomeFaq";
@@ -41,7 +44,7 @@ import { jobCategories, jobCategoryList } from "@/lib/jobs/categories";
 import { faqPageJsonLd, itemListJsonLd } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
-import { formatDate, humanizeTag } from "@/lib/utils";
+import { humanizeTag } from "@/lib/utils";
 
 export const revalidate = 3600;
 
@@ -127,12 +130,12 @@ export default async function HomePage() {
     .sort()
     .at(-1);
 
-  const stats = [
-    { label: "Open jobs", value: jobs.length, href: "/jobs" },
-    { label: "Remote roles", value: remoteCount, href: "/jobs?model=remote" },
-    { label: "Internships", value: internshipCount, href: "/jobs?type=internship" },
-    { label: "Guides", value: allArticles.length, href: "/blog" },
-    { label: "Topics", value: categoryList.length, href: "/blog" },
+  const stats: GlanceStat[] = [
+    { label: "Open jobs", value: jobs.length, href: "/jobs", icon: Briefcase, hint: "Hiring right now" },
+    { label: "Remote roles", value: remoteCount, href: "/jobs?model=remote", icon: Laptop, hint: "Work from anywhere" },
+    { label: "Internships", value: internshipCount, href: "/jobs?type=internship", icon: GraduationCap, hint: "Start your career" },
+    { label: "Guides", value: allArticles.length, href: "/blog", icon: BookOpen, hint: "Practical how-tos" },
+    { label: "Topics", value: categoryList.length, href: "/blog", icon: Hash, hint: "Explore by subject" },
   ];
 
   // Starting points. Category links are dropped if that category was removed in the admin panel.
@@ -338,33 +341,7 @@ export default async function HomePage() {
       </section>
 
       {/* At a glance: live numbers from the same data the pages use */}
-      <section aria-labelledby="at-a-glance" className="border-y border-white/10 bg-navy text-white dark:border-border dark:bg-surface">
-        <div className="container-page flex flex-col gap-8 py-10 sm:py-12 lg:flex-row lg:items-center lg:gap-14">
-          <div className="shrink-0">
-            <h2 id="at-a-glance" className="text-xs font-semibold uppercase tracking-[0.14em] text-sky-300">
-              At a glance
-            </h2>
-            {lastUpdated && (
-              <p className="mt-2 flex items-center gap-2 text-sm text-white/70">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" aria-hidden />
-                Updated <time dateTime={lastUpdated}>{formatDate(lastUpdated)}</time>
-              </p>
-            )}
-          </div>
-          <dl className="grid flex-1 grid-cols-2 gap-px overflow-hidden rounded-2xl bg-white/10 sm:grid-cols-5">
-            {stats.map(({ label, value, href }) => (
-              <div key={label} className="relative bg-navy px-6 py-5 transition-colors hover:bg-white/5 dark:bg-surface">
-                <dt className="text-sm text-white/70">
-                  <Link href={href} className="after:absolute after:inset-0">
-                    {label}
-                  </Link>
-                </dt>
-                <dd className="mt-1 font-display text-3xl font-semibold tabular-nums">{value}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-      </section>
+      <AtAGlance stats={stats} lastUpdated={lastUpdated} />
 
       {/* Start here: three common goals, each with its jobs and guides */}
       <section aria-labelledby="start-here" className="container-page py-20 sm:py-24 lg:py-28">

@@ -4,7 +4,7 @@ test("homepage renders key sections with a single h1", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("h1")).toHaveCount(1);
   for (const name of [
-    "At a glance",
+    "Today's jobs & career guides",
     "Featured guides and jobs",
     "Key learnings from our guides",
     "Browse jobs by category and guides by topic",
@@ -19,7 +19,7 @@ test("main navigation and category filters work", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Blog" }).click();
   await expect(page).toHaveURL(/\/blog$/);
-  await expect(page.getByRole("heading", { level: 1, name: "All articles" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Practical guides for work and everyday life" })).toBeVisible();
 
   await page.getByRole("navigation", { name: "Filter by category" }).getByRole("link", { name: /Travel/ }).click();
   await expect(page).toHaveURL(/\/category\/travel$/);

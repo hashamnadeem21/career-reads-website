@@ -5,7 +5,7 @@ const SLUG = "how-passkeys-work";
 test("article page has metadata, structured data, TOC and related content", async ({ page }) => {
   await page.goto(`/blog/${SLUG}`);
 
-  await expect(page).toHaveTitle("Passkeys Explained: How Passwordless Sign-In Works | Career Reads");
+  await expect(page).toHaveTitle("Passkeys Explained: How Passwordless Sign-In Works");
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", new RegExp(`/blog/${SLUG}$`));
   await expect(page.locator('meta[property="og:type"]')).toHaveAttribute("content", "article");
   await expect(page.locator('meta[property="og:image"]').first()).toHaveAttribute("content", /opengraph-image/);

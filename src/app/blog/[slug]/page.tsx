@@ -18,6 +18,7 @@ import { categories } from "@/lib/categories";
 import { hasApi } from "@/lib/api/client";
 import { getAllArticles, getArticleBySlug, getAuthor, getRelatedArticles } from "@/lib/content";
 import { articleJsonLd } from "@/lib/jsonld";
+import { metaDescription, pageTitle } from "@/lib/seo";
 import { absoluteUrl, siteConfig } from "@/lib/site";
 import { formatDate, humanizeTag } from "@/lib/utils";
 
@@ -37,11 +38,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const author = await getAuthor(article.author);
   const path = `/blog/${article.slug}`;
   const title = article.seoTitle ?? article.title;
-  const description = article.seoDescription ?? article.excerpt;
+  const description = metaDescription(article.seoDescription ?? article.excerpt);
   const noindex = article.noindex || article.status !== "published";
 
   return {
-    title,
+    title: pageTitle(title),
     description,
     alternates: { canonical: article.canonicalUrl ?? absoluteUrl(path) },
     authors: author ? [{ name: author.name, url: absoluteUrl(`/authors/${author.slug}`) }] : undefined,
