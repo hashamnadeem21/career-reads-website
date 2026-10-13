@@ -17,17 +17,17 @@ export function KeyLearnings({ articles }: { articles: ArticleSummary[] }) {
   return (
     <ol className="grid gap-px overflow-hidden rounded-3xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
       {articles.map((article, i) => (
-        <li key={article.slug} className="group relative flex flex-col bg-background p-6 transition-colors hover:bg-surface sm:p-7">
+        <li key={article.slug} className="group relative flex flex-col bg-background p-7 transition-colors hover:bg-surface sm:p-9">
           <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.14em]">
             <span className="tabular-nums text-link">{String(i + 1).padStart(2, "0")}</span>
             <span className="text-muted">{categories[article.category].name}</span>
           </div>
-          <p className="mt-5 flex-1 font-display text-lg font-medium leading-snug text-balance">
+          <p className="mt-6 flex-1 font-display text-lg font-medium leading-snug text-balance">
             {learningFrom(article.excerpt)}
           </p>
           <Link
             href={`/blog/${article.slug}`}
-            className="mt-6 inline-flex items-start gap-1.5 text-sm text-muted after:absolute after:inset-0 group-hover:text-link"
+            className="mt-8 inline-flex items-start gap-1.5 text-sm text-muted after:absolute after:inset-0 group-hover:text-link"
           >
             <span>
               From <span className="font-semibold text-foreground group-hover:text-link">{article.title}</span>

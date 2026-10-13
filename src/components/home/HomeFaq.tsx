@@ -48,7 +48,7 @@ export function HomeFaq({ items }: { items: HomeFaqItem[] }) {
       </div>
 
       {headline && (
-        <div className="relative mt-10 overflow-hidden rounded-3xl border border-brand/30 bg-gradient-to-br from-surface-strong to-background p-6 sm:p-8">
+        <div className="relative mt-14 overflow-hidden rounded-3xl border border-brand/30 bg-gradient-to-br from-surface-strong to-background p-7 sm:p-10">
           <span aria-hidden className="absolute -right-6 -top-10 font-display text-[10rem] font-bold leading-none text-brand/10">
             ?
           </span>
@@ -60,21 +60,21 @@ export function HomeFaq({ items }: { items: HomeFaqItem[] }) {
         </div>
       )}
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      <div className="mt-8 grid gap-8 lg:grid-cols-2">
         {groups.map(({ key, title, icon: Icon }) => (
-          <div key={key} className="rounded-3xl border border-border bg-surface p-3 sm:p-4">
+          <div key={key} className="rounded-3xl border border-border bg-surface p-4 sm:p-6">
             <h3 className="flex items-center gap-2 px-3 py-2 text-sm font-semibold uppercase tracking-[0.14em] text-muted">
               <Icon className="h-4 w-4 text-link" aria-hidden />
               {title}
             </h3>
-            <ul className="mt-1 space-y-2">
+            <ul className="mt-3 space-y-3">
               {rest
                 .filter(({ item }) => item.group === key)
                 .map(({ item, n }) => {
                   return (
                     <li key={item.question}>
                       <details className="group rounded-2xl border border-transparent bg-background transition-colors open:border-brand/40 open:shadow-lg open:shadow-blue-500/5 hover:border-border">
-                        <summary className="flex cursor-pointer list-none items-center gap-4 p-4 [&::-webkit-details-marker]:hidden">
+                        <summary className="flex cursor-pointer list-none items-center gap-4 p-5 [&::-webkit-details-marker]:hidden">
                           <span
                             aria-hidden
                             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-strong text-xs font-semibold tabular-nums text-link group-open:bg-brand group-open:text-white"
@@ -84,7 +84,7 @@ export function HomeFaq({ items }: { items: HomeFaqItem[] }) {
                           <h4 className="flex-1 font-semibold leading-snug">{item.question}</h4>
                           <Plus className="h-5 w-5 shrink-0 text-muted transition-transform duration-300 group-open:rotate-45 group-open:text-link" aria-hidden />
                         </summary>
-                        <div className="px-4 pb-5 pl-16">
+                        <div className="px-5 pb-6 pl-[4.25rem]">
                           <Answer item={item} />
                         </div>
                       </details>
@@ -96,7 +96,7 @@ export function HomeFaq({ items }: { items: HomeFaqItem[] }) {
         ))}
       </div>
 
-      <div className="mt-6 flex flex-col items-start gap-4 rounded-3xl bg-navy p-6 text-white ring-1 ring-white/10 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+      <div className="mt-8 flex flex-col items-start gap-4 rounded-3xl bg-navy p-7 text-white ring-1 ring-white/10 sm:flex-row sm:items-center sm:justify-between sm:p-8">
         <div>
           <p className="font-display text-xl font-semibold">Didn&apos;t find your answer?</p>
           <p className="mt-1 text-sm text-white/70">Search the guides, or ask the editors directly.</p>

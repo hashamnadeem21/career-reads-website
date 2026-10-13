@@ -46,13 +46,13 @@ export function FeaturedBento({ articles, jobs }: { articles: ArticleSummary[]; 
   const [lead, ...rest] = articles;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-14">
       {lead && (
-        <div className="grid gap-5 lg:grid-cols-12">
+        <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
           <div className="lg:col-span-7">
             <LeadArticle article={lead} />
           </div>
-          <ul className="grid gap-5 lg:col-span-5">
+          <ul className="grid gap-6 lg:col-span-5 lg:gap-8">
             {rest.map((article) => (
               <li key={article.slug}>
                 <ArticleCard article={article} variant="horizontal" />
@@ -64,14 +64,14 @@ export function FeaturedBento({ articles, jobs }: { articles: ArticleSummary[]; 
 
       {jobs.length > 0 && (
         <div>
-          <div className="mb-4 flex items-baseline justify-between gap-4">
+          <div className="mb-6 flex items-baseline justify-between gap-4">
             <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted">Featured and newest jobs</h3>
             <Link href="/jobs" className="group inline-flex items-center gap-1 text-sm font-semibold text-link">
               All open jobs
               <ArrowUpRight className="h-4 w-4 transition group-hover:rotate-45" aria-hidden />
             </Link>
           </div>
-          <ul className="grid gap-4 md:grid-cols-2">
+          <ul className="grid gap-5 md:grid-cols-2 lg:gap-6">
             {jobs.map((job) => (
               <li key={job.slug}>
                 <JobCard job={job} />

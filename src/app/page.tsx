@@ -20,7 +20,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { FeaturedBento } from "@/components/home/FeaturedBento";
-import { HeroModels } from "@/components/home/HeroModels";
+import { HeroGlobe } from "@/components/home/HeroGlobe";
 import { HomeFaq, type HomeFaqItem } from "@/components/home/HomeFaq";
 import { KeyLearnings } from "@/components/home/KeyLearnings";
 import { NewsletterBand } from "@/components/home/NewsletterBand";
@@ -52,11 +52,11 @@ export const metadata: Metadata = buildMetadata({
   absoluteTitle: true,
 });
 
-/** Shortcut chips that float over the 3D scene. */
+/** Shortcut chips that float around the globe. */
 const floatingChips = [
-  { href: "/jobs?model=remote", label: "Remote jobs", icon: Laptop, className: "left-0 top-[14%]", delay: "0s" },
-  { href: "/jobs?type=internship", label: "Internships", icon: GraduationCap, className: "right-0 top-[44%]", delay: "1.2s" },
-  { href: "/jobs?category=software-it", label: "Software & IT", icon: Code, className: "bottom-[8%] left-[10%]", delay: "2.4s" },
+  { href: "/jobs?model=remote", label: "Remote jobs", icon: Laptop, className: "left-0 top-[4%]", delay: "0s" },
+  { href: "/jobs?type=internship", label: "Internships", icon: GraduationCap, className: "right-0 top-[12%]", delay: "1.2s" },
+  { href: "/jobs?category=software-it", label: "Software & IT", icon: Code, className: "bottom-[4%] right-[6%]", delay: "2.4s" },
 ];
 
 const principles = [
@@ -259,7 +259,7 @@ export default async function HomePage() {
         ]}
       />
 
-      {/* Hero: answer-first summary + search on the left, 3D scene on the right */}
+      {/* Hero: answer-first summary + search on the left, 3D globe on the right */}
       <section className="relative overflow-hidden">
         <div
           aria-hidden
@@ -269,7 +269,7 @@ export default async function HomePage() {
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_78%_45%,color-mix(in_oklab,var(--brand)_14%,transparent),transparent_55%)]"
         />
-        <div className="container-page relative grid items-center gap-8 py-12 sm:py-16 lg:grid-cols-12 lg:gap-10 lg:py-20">
+        <div className="container-page relative grid items-center gap-12 py-16 sm:py-20 lg:grid-cols-12 lg:gap-16 lg:py-28">
           <div className="lg:col-span-7">
             <p className="animate-rise inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1 text-xs font-semibold text-link">
               <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden /> Jobs · Guides · Learnings
@@ -281,7 +281,7 @@ export default async function HomePage() {
               Latest jobs and <span className="text-gradient">practical guides</span>, in one place.
             </h1>
 
-            <div className="animate-rise mt-8 max-w-2xl border-l-4 border-brand pl-5" style={{ animationDelay: "160ms" }}>
+            <div className="animate-rise mt-10 max-w-2xl border-l-4 border-brand pl-5" style={{ animationDelay: "160ms" }}>
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">In short</p>
               <p className="mt-2 text-lg leading-relaxed">{summary}</p>
             </div>
@@ -290,7 +290,7 @@ export default async function HomePage() {
               action="/jobs"
               method="get"
               role="search"
-              className="animate-rise mt-8 flex max-w-2xl flex-col gap-2 rounded-2xl border border-border bg-background p-2 shadow-lg shadow-blue-500/5 sm:flex-row"
+              className="animate-rise mt-10 flex max-w-2xl flex-col gap-2 rounded-2xl border border-border bg-background p-2 shadow-lg shadow-blue-500/5 sm:flex-row"
               style={{ animationDelay: "240ms" }}
             >
               <label htmlFor="home-q" className="sr-only">
@@ -310,7 +310,7 @@ export default async function HomePage() {
                 Search jobs
               </button>
             </form>
-            <p className="animate-rise mt-3 text-sm text-muted" style={{ animationDelay: "280ms" }}>
+            <p className="animate-rise mt-4 text-sm text-muted" style={{ animationDelay: "280ms" }}>
               Looking for a guide instead?{" "}
               <Link href="/search" className="font-semibold text-link hover:underline">
                 Search the guides
@@ -319,7 +319,7 @@ export default async function HomePage() {
           </div>
 
           <div className="relative mx-auto aspect-square w-full max-w-[24rem] sm:max-w-md lg:col-span-5 lg:max-w-none">
-            <HeroModels className="absolute inset-0 h-full w-full" />
+            <HeroGlobe className="absolute inset-0 h-full w-full" />
             {floatingChips.map(({ href, label, icon: Icon, className, delay }) => (
               <Link
                 key={href}
@@ -339,7 +339,7 @@ export default async function HomePage() {
 
       {/* At a glance: live numbers from the same data the pages use */}
       <section aria-labelledby="at-a-glance" className="border-y border-white/10 bg-navy text-white dark:border-border dark:bg-surface">
-        <div className="container-page flex flex-col gap-6 py-8 lg:flex-row lg:items-center lg:gap-10">
+        <div className="container-page flex flex-col gap-8 py-10 sm:py-12 lg:flex-row lg:items-center lg:gap-14">
           <div className="shrink-0">
             <h2 id="at-a-glance" className="text-xs font-semibold uppercase tracking-[0.14em] text-sky-300">
               At a glance
@@ -353,7 +353,7 @@ export default async function HomePage() {
           </div>
           <dl className="grid flex-1 grid-cols-2 gap-px overflow-hidden rounded-2xl bg-white/10 sm:grid-cols-5">
             {stats.map(({ label, value, href }) => (
-              <div key={label} className="relative bg-navy px-5 py-4 transition-colors hover:bg-white/5 dark:bg-surface">
+              <div key={label} className="relative bg-navy px-6 py-5 transition-colors hover:bg-white/5 dark:bg-surface">
                 <dt className="text-sm text-white/70">
                   <Link href={href} className="after:absolute after:inset-0">
                     {label}
@@ -367,18 +367,18 @@ export default async function HomePage() {
       </section>
 
       {/* Start here: three common goals, each with its jobs and guides */}
-      <section aria-labelledby="start-here" className="container-page py-16">
+      <section aria-labelledby="start-here" className="container-page py-20 sm:py-24 lg:py-28">
         <SectionHeading
           id="start-here"
           eyebrow="Start here"
           title="Pick a path"
           description="Three common goals, each with the jobs and guides that go with it."
         />
-        <ul className="grid gap-5 md:grid-cols-3">
+        <ul className="mt-4 grid gap-6 md:grid-cols-3 lg:gap-8">
           {paths.map(({ icon: Icon, title, body, links }, i) => (
             <li
               key={title}
-              className="group relative overflow-hidden rounded-3xl border border-border bg-background p-6 transition duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-xl hover:shadow-blue-500/10"
+              className="group relative overflow-hidden rounded-3xl border border-border bg-background p-7 transition duration-300 hover:-translate-y-1 sm:p-8 hover:border-brand/40 hover:shadow-xl hover:shadow-blue-500/10"
             >
               <span aria-hidden className="absolute right-5 top-4 font-display text-6xl font-bold text-surface-strong">
                 {i + 1}
@@ -388,7 +388,7 @@ export default async function HomePage() {
               </span>
               <h3 className="relative mt-5 font-display text-xl font-semibold">{title}</h3>
               <p className="relative mt-2 text-sm leading-relaxed text-muted">{body}</p>
-              <ul className="relative mt-5 space-y-1 border-t border-border pt-4">
+              <ul className="relative mt-6 space-y-1.5 border-t border-border pt-5">
                 {links.map((link) => (
                   <li key={link.href}>
                     <Link href={link.href} className="flex items-center justify-between rounded-lg px-2 py-1.5 text-sm font-medium hover:bg-surface hover:text-link">
@@ -404,21 +404,25 @@ export default async function HomePage() {
       </section>
 
       {/* Featured: one lead guide, two more, and the featured jobs */}
-      <section aria-labelledby="featured" className="container-page pb-16">
-        <SectionHeading
-          id="featured"
-          eyebrow="Featured"
-          title="Featured guides and jobs"
-          description="A few things worth your time right now, picked by our editors."
-          href="/blog"
-          linkLabel="All guides"
-        />
-        <FeaturedBento articles={featured} jobs={featuredJobs} />
+      <section aria-labelledby="featured" className="border-t border-border bg-surface/50 py-20 sm:py-24 lg:py-28">
+        <div className="container-page">
+          <SectionHeading
+            id="featured"
+            eyebrow="Featured"
+            title="Featured guides and jobs"
+            description="A few things worth your time right now, picked by our editors."
+            href="/blog"
+            linkLabel="All guides"
+          />
+          <div className="mt-4">
+            <FeaturedBento articles={featured} jobs={featuredJobs} />
+          </div>
+        </div>
       </section>
 
       {/* Key learnings: one quotable idea per guide */}
       {learnings.length > 0 && (
-        <section aria-labelledby="learnings" className="border-y border-border bg-surface py-16">
+        <section aria-labelledby="learnings" className="border-y border-border bg-surface py-20 sm:py-24 lg:py-28">
           <div className="container-page">
             <SectionHeading
               id="learnings"
@@ -428,14 +432,16 @@ export default async function HomePage() {
               href="/trending"
               linkLabel="Trending guides"
             />
-            <KeyLearnings articles={learnings} />
+            <div className="mt-4">
+              <KeyLearnings articles={learnings} />
+            </div>
           </div>
         </section>
       )}
 
       {/* Where the jobs are + who is hiring */}
       {jobs.length > 0 && (
-        <section aria-labelledby="hiring" className="container-page py-16">
+        <section aria-labelledby="hiring" className="container-page py-20 sm:py-24 lg:py-28">
           <SectionHeading
             id="hiring"
             eyebrow="Hiring now"
@@ -444,12 +450,12 @@ export default async function HomePage() {
             href="/jobs"
             linkLabel="All open jobs"
           />
-          <div className="grid gap-6 lg:grid-cols-5">
-            <div className="rounded-3xl border border-border p-6 lg:col-span-2">
+          <div className="mt-4 grid gap-8 lg:grid-cols-5">
+            <div className="rounded-3xl border border-border p-7 sm:p-8 lg:col-span-2">
               <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-muted">
                 <MapPin className="h-4 w-4 text-link" aria-hidden /> Jobs by city
               </h3>
-              <ul className="mt-4 space-y-3">
+              <ul className="mt-6 space-y-4">
                 {cities.map(({ name, count }) => (
                   <li key={name}>
                     <Link href={`/jobs?q=${encodeURIComponent(name)}`} className="group block">
@@ -478,11 +484,11 @@ export default async function HomePage() {
                 )}
               </ul>
             </div>
-            <div className="rounded-3xl border border-border p-6 lg:col-span-3">
+            <div className="rounded-3xl border border-border p-7 sm:p-8 lg:col-span-3">
               <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-muted">
                 <Building2 className="h-4 w-4 text-link" aria-hidden /> Companies hiring
               </h3>
-              <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+              <ul className="mt-6 grid gap-4 sm:grid-cols-2">
                 {companies.map(({ name, count }) => (
                   <li key={name}>
                     <Link
@@ -519,65 +525,67 @@ export default async function HomePage() {
       </div>
 
       {/* Topic index: every hub page with real counts, plus popular tags */}
-      <section aria-labelledby="explore" className="container-page py-16">
-        <SectionHeading
-          id="explore"
-          eyebrow="Explore"
-          title="Browse jobs by category and guides by topic"
-          description="Every job category and every guide topic, with how many are live right now."
-        />
-        <div className="grid gap-12 lg:grid-cols-2">
-          <TopicIndex
-            id="index-jobs"
-            title="Jobs by category"
-            unit={["job", "jobs"]}
-            entries={jobCategoryList.map((c) => ({
-              href: `/jobs?category=${c.slug}`,
-              name: c.name,
-              count: jobCounts[c.slug] ?? 0,
-            }))}
+      <section aria-labelledby="explore" className="border-t border-border py-20 sm:py-24 lg:py-28">
+        <div className="container-page">
+          <SectionHeading
+            id="explore"
+            eyebrow="Explore"
+            title="Browse jobs by category and guides by topic"
+            description="Every job category and every guide topic, with how many are live right now."
           />
-          <TopicIndex
-            id="index-topics"
-            title="Guides by topic"
-            unit={["guide", "guides"]}
-            entries={categoryList.map((c) => ({
-              href: `/category/${c.slug}`,
-              name: c.name,
-              count: articleCounts[c.slug] ?? 0,
-            }))}
-          />
-        </div>
-        {topicTags.length > 0 && (
-          <div className="mt-12 rounded-3xl bg-surface p-6 sm:p-8">
-            <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-muted">
-              <Compass className="h-4 w-4 text-link" aria-hidden /> Popular in our guides
-            </h3>
-            <ul className="mt-4 flex flex-wrap gap-2">
-              {topicTags.map(({ tag }) => (
-                <li key={tag}>
-                  <Link
-                    href={`/search?q=${encodeURIComponent(humanizeTag(tag))}`}
-                    className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-3.5 py-1.5 text-sm font-medium capitalize hover:border-brand hover:text-link"
-                  >
-                    <Hash className="h-3.5 w-3.5 text-muted" aria-hidden />
-                    {humanizeTag(tag)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <div className="mt-4 grid gap-14 lg:grid-cols-2 lg:gap-20">
+            <TopicIndex
+              id="index-jobs"
+              title="Jobs by category"
+              unit={["job", "jobs"]}
+              entries={jobCategoryList.map((c) => ({
+                href: `/jobs?category=${c.slug}`,
+                name: c.name,
+                count: jobCounts[c.slug] ?? 0,
+              }))}
+            />
+            <TopicIndex
+              id="index-topics"
+              title="Guides by topic"
+              unit={["guide", "guides"]}
+              entries={categoryList.map((c) => ({
+                href: `/category/${c.slug}`,
+                name: c.name,
+                count: articleCounts[c.slug] ?? 0,
+              }))}
+            />
           </div>
-        )}
+          {topicTags.length > 0 && (
+            <div className="mt-16 rounded-3xl bg-surface p-7 sm:p-10">
+              <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-muted">
+                <Compass className="h-4 w-4 text-link" aria-hidden /> Popular in our guides
+              </h3>
+              <ul className="mt-6 flex flex-wrap gap-2.5">
+                {topicTags.map(({ tag }) => (
+                  <li key={tag}>
+                    <Link
+                      href={`/search?q=${encodeURIComponent(humanizeTag(tag))}`}
+                      className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-3.5 py-1.5 text-sm font-medium capitalize hover:border-brand hover:text-link"
+                    >
+                      <Hash className="h-3.5 w-3.5 text-muted" aria-hidden />
+                      {humanizeTag(tag)}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       </section>
 
       {/* How it works: the trust signals behind the listings and guides */}
-      <section aria-labelledby="how-it-works" className="bg-navy py-16 text-white dark:border-y dark:border-border dark:bg-surface">
+      <section aria-labelledby="how-it-works" className="bg-navy py-20 text-white sm:py-24 lg:py-28 dark:border-y dark:border-border dark:bg-surface">
         <div className="container-page">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-sky-300">How it works</p>
           <h2 id="how-it-works" className="mt-2 max-w-2xl font-display text-3xl font-semibold tracking-tight sm:text-4xl">
             How {siteConfig.name} works
           </h2>
-          <ul className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="mt-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
             {principles.map(({ icon: Icon, title, body, link }) => (
               <li key={title}>
                 <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-sky-300" aria-hidden>
@@ -598,11 +606,11 @@ export default async function HomePage() {
       </section>
 
       {/* FAQ: mirrored in the FAQPage JSON-LD above */}
-      <section aria-labelledby="faq" className="container-page py-16">
+      <section aria-labelledby="faq" className="container-page py-20 sm:py-24 lg:py-28">
         <HomeFaq items={faqs} />
       </section>
 
-      <div className="pb-16">
+      <div className="pb-20 sm:pb-24 lg:pb-28">
         <NewsletterBand />
       </div>
     </>
