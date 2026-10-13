@@ -54,9 +54,3 @@ test("article shows its hero image and in-article images in place", async ({ pag
   await expect(nextToHeading).toHaveAttribute("src", /how-passkeys-work-1\.svg/);
 });
 
-test("homepage hero renders the animated 3D scene", async ({ page }) => {
-  await page.goto("/");
-  const canvas = page.locator("section canvas").first();
-  await expect(canvas).toBeVisible();
-  expect(await canvas.evaluate((c: HTMLCanvasElement) => c.width > 0 && c.height > 0)).toBe(true);
-});

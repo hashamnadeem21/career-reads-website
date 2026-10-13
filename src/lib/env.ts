@@ -58,7 +58,7 @@ const publicSchema = z.object({
   NEXT_PUBLIC_ADSENSE_SLOT_LISTING: optionalString,
   NEXT_PUBLIC_CONTACT_EMAIL: z.preprocess(
     emptyToUndefined,
-    z.email().default("hello@example.com"),
+    z.email().default("contact@careersreads.com"),
   ),
 });
 

@@ -3,7 +3,14 @@ import { expect, test } from "@playwright/test";
 test("homepage renders key sections with a single h1", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("h1")).toHaveCount(1);
-  for (const name of ["Browse jobs by category", "Latest jobs", "Latest articles", "Read by topic", "One thoughtful email a week"]) {
+  for (const name of [
+    "At a glance",
+    "Featured guides and jobs",
+    "Key learnings from our guides",
+    "Browse jobs by category and guides by topic",
+    "Frequently asked questions",
+    "One thoughtful email a week",
+  ]) {
     await expect(page.getByRole("heading", { name, exact: false }).first()).toBeVisible();
   }
 });

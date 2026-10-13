@@ -86,6 +86,37 @@ export function collectionPageJsonLd(name: string, description: string, path: st
   };
 }
 
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+/** The visible FAQ on the page must say the same thing as this markup. */
+export function faqPageJsonLd(items: FaqItem[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map(({ question, answer }) => ({
+      "@type": "Question",
+      name: question,
+      acceptedAnswer: { "@type": "Answer", text: answer },
+    })),
+  };
+}
+
+export function itemListJsonLd(name: string, paths: string[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name,
+    itemListElement: paths.map((path, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: absoluteUrl(path),
+    })),
+  };
+}
+
 const employmentTypeSchema: Record<Job["employmentType"], string> = {
   "full-time": "FULL_TIME",
   "part-time": "PART_TIME",

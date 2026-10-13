@@ -183,7 +183,7 @@
     transform: none;
   }
 }
-/* Gentle bobbing for the tags floating around the hero scene. */
+/* Gentle bobbing for the chips floating over the hero scene. */
 @keyframes float {
   0%,
   100% {
