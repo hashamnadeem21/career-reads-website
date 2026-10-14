@@ -141,12 +141,14 @@ export function jobPostingJsonLd(job: Job) {
     "@id": `${url}#job`,
     url,
     title: job.title,
-    description: [
-      `<p>${job.summary.replace(/</g, "&lt;")}</p>`,
-      htmlList("Responsibilities", job.responsibilities),
-      htmlList("Requirements", job.requirements),
-      htmlList("Benefits", job.benefits),
-    ].join(""),
+    description:
+      job.description ??
+      [
+        `<p>${job.summary.replace(/</g, "&lt;")}</p>`,
+        htmlList("Responsibilities", job.responsibilities),
+        htmlList("Requirements", job.requirements),
+        htmlList("Benefits", job.benefits),
+      ].join(""),
     datePosted: job.postedAt,
     ...(job.deadline && { validThrough: job.deadline }),
     employmentType: employmentTypeSchema[job.employmentType],
