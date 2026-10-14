@@ -37,6 +37,12 @@ export default async function PrivacyPolicyPage() {
           <strong>Contact form:</strong> if you contact us, we collect your name, email address, and message, and use
           them only to respond. Messages are delivered to our inbox through an email delivery provider.
         </li>
+        <li id="job-applications">
+          <strong>Job applications:</strong> when you apply for a job on {siteConfig.name}, we collect your name, email
+          address, phone number, CV, and anything else you choose to send (your location, LinkedIn profile, a note,
+          and answers to the employer&apos;s questions). We share them only with the employer that posted that job, so
+          they can consider you for it, and email you a receipt. Your CV is stored privately and is never public.
+        </li>
       </ul>
 
       <h2>Information collected automatically</h2>
@@ -82,15 +88,17 @@ export default async function PrivacyPolicyPage() {
       <h2>How long we keep information</h2>
       <p>
         We keep newsletter subscriptions until you unsubscribe and contact messages for as long as needed to respond
-        and keep a reasonable record of the conversation. Analytics data is retained according to the retention
-        settings configured in Google Analytics.
+        and keep a reasonable record of the conversation. Job applications, including CVs, are deleted 6 months
+        after the job&apos;s closing date (or 6 months after you applied, if that is later). Analytics data is retained
+        according to the retention settings configured in Google Analytics.
       </p>
 
       <h2>Your rights</h2>
       <p>
         Depending on where you live, you may have the right to access, correct, delete, or export your personal
         information, and to object to or restrict certain processing. To make a request, email{" "}
-        <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>.
+        <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>. If you ask us to delete your job
+        applications, we delete every application you made on {siteConfig.name} and your CVs.
       </p>
 
       <h2>Children</h2>

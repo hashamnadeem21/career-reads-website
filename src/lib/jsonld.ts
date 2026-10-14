@@ -172,6 +172,7 @@ export function jobPostingJsonLd(job: Job) {
             },
           },
         }),
-    directApply: false,
+    // Applying on Career Reads itself counts as direct apply for Google for Jobs.
+    directApply: Boolean(job.onsiteApply),
   };
 }

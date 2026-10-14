@@ -19,6 +19,8 @@ export class ApiRequestError extends Error {
     readonly status: number,
     readonly code: string,
     message: string,
+    /** Per-field messages on a 400 `validation_failed` (and some 409s). */
+    readonly fields: Record<string, string> = {},
   ) {
     super(message);
     this.name = "ApiRequestError";
@@ -46,22 +48,27 @@ async function call(path: string, { method = "GET", query, body, visitor }: Call
   if (SITE_API_KEY) headers["x-api-key"] = SITE_API_KEY;
   if (visitor?.ip) headers["x-client-ip"] = visitor.ip;
   if (visitor?.userAgent) headers["x-client-user-agent"] = visitor.userAgent;
-  if (body !== undefined) headers["content-type"] = "application/json";
+  const isForm = body instanceof FormData;
+  if (body !== undefined && !isForm) headers["content-type"] = "application/json";
 
   const response = await fetch(url, {
     method,
     headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
+    // FormData (a CV upload) is sent as multipart; fetch sets its boundary header itself.
+    body: body === undefined ? undefined : isForm ? body : JSON.stringify(body),
     // Reads are cached by the callers (unstable_cache + tags), never by fetch itself.
     cache: "no-store",
-    signal: AbortSignal.timeout(10_000),
+    signal: AbortSignal.timeout(isForm ? 30_000 : 10_000),
   });
   if (!response.ok) {
-    const error = (await response.json().catch(() => null)) as { error?: { code?: string; message?: string } } | null;
+    const error = (await response.json().catch(() => null)) as {
+      error?: { code?: string; message?: string; fields?: Record<string, string> };
+    } | null;
     throw new ApiRequestError(
       response.status,
       error?.error?.code ?? "error",
       error?.error?.message ?? `API answered ${response.status} for ${method} ${url.pathname}`,
+      error?.error?.fields,
     );
   }
   return response;
@@ -77,7 +84,7 @@ export async function apiGet<T>(path: string, query?: CallOptions["query"]): Pro
   }
 }
 
-/** POST JSON. Resolves when the API accepted it; throws ApiRequestError otherwise. */
+/** POST JSON (or FormData, as multipart). Resolves when the API accepted it; throws ApiRequestError otherwise. */
 export async function apiPost(path: string, body: unknown, visitor?: CallOptions["visitor"]): Promise<void> {
   await call(path, { method: "POST", body, visitor });
 }

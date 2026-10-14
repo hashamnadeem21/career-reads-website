@@ -39,6 +39,8 @@ export const jobSchema = z
     responsibilities: listItems.default([]),
     requirements: listItems.default([]),
     benefits: listItems.default([]),
+    /** Takes applications on Career Reads (/jobs/<slug>/apply). The link or email, if set, is offered too. */
+    onsiteApply: z.boolean().default(false),
     applyUrl: z.url().optional(),
     applyEmail: z.email().optional(),
     postedAt: isoDate,
@@ -50,8 +52,8 @@ export const jobSchema = z
     sample: z.boolean().default(false),
   })
   .strict()
-  .refine((job) => job.applyUrl || job.applyEmail, {
-    message: "Add an applyUrl or an applyEmail so people can apply",
+  .refine((job) => job.onsiteApply || job.applyUrl || job.applyEmail, {
+    message: "Add an applyUrl or an applyEmail (or onsiteApply) so people can apply",
     path: ["applyUrl"],
   });
 

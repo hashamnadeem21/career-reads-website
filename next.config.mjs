@@ -10,6 +10,12 @@ const securityHeaders = [
     value: "camera=(), microphone=(), geolocation=(), browsing-topics=()",
   },
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
+  // Blocks <base> hijacking, forms posting to other sites, old plugins and being framed by other
+  // sites. Scripts aren't restricted here, so ads and analytics keep working.
+  {
+    key: "Content-Security-Policy",
+    value: "base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'self'",
+  },
 ];
 
 /** @type {import("next").NextConfig} */
@@ -18,6 +24,10 @@ const nextConfig = {
   distDir: process.env.NEXT_DIST_DIR || ".next",
   poweredByHeader: false,
   reactStrictMode: true,
+  experimental: {
+    // Job applications carry a CV (the form allows 4 MB; Vercel refuses function requests over 4.5 MB).
+    serverActions: { bodySizeLimit: "4.5mb" },
+  },
   // MDX files are read from disk at build/revalidation time, make sure they
   // are traced into the serverless bundle on Vercel.
   outputFileTracingIncludes: {
