@@ -2,9 +2,11 @@ import { Building2, MapPin, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AuthPanel } from "@/components/account/AuthPanel";
 import { ApplyForm } from "@/components/jobs/ApplyForm";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { apiGet, apiPath, hasApi } from "@/lib/api/client";
+import { currentCandidate } from "@/lib/candidate/session";
 import { getJobBySlug, jobLocation } from "@/lib/jobs";
 import type { FormQuestion } from "@/lib/jobs/questions";
 import { pageTitle } from "@/lib/seo";
@@ -28,12 +30,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-/** Applying on Career Reads. Only for jobs that take applications here; anything else is a 404. */
+/**
+ * Applying on Career Reads. Only for jobs that take applications here; anything else is a 404.
+ * It needs an account (Google or email): signed out, the page offers sign-in first.
+ */
 export default async function ApplyPage({ params }: Props) {
   const { slug } = await params;
   const job = await getJobBySlug(slug);
   if (!job?.onsiteApply) notFound();
-  const form = await getApplicationForm(slug);
+  const [form, candidate] = await Promise.all([getApplicationForm(slug), currentCandidate()]);
   if (!form) notFound();
 
   return (
@@ -63,9 +68,27 @@ export default async function ApplyPage({ params }: Props) {
         </p>
       </header>
 
-      <section aria-label="Application" className="mt-8 rounded-2xl border border-border bg-background p-5 sm:p-8">
-        <ApplyForm slug={job.slug} jobTitle={job.title} company={job.company} questions={form.questions} />
-      </section>
+      {candidate ? (
+        <section aria-label="Application" className="mt-8 rounded-2xl border border-border bg-background p-5 sm:p-8">
+          <ApplyForm
+            slug={job.slug}
+            jobTitle={job.title}
+            company={job.company}
+            questions={form.questions}
+            candidate={{ name: candidate.name, email: candidate.email, emailVerified: candidate.emailVerified, subscribed: candidate.subscribed }}
+          />
+        </section>
+      ) : (
+        <section aria-labelledby="sign-in-to-apply" className="mt-8 rounded-2xl border border-border bg-background p-5 sm:p-8">
+          <h2 id="sign-in-to-apply" className="text-center text-xl font-semibold">
+            Sign in to apply
+          </h2>
+          <p className="mx-auto mt-2 mb-6 max-w-md text-center text-sm text-muted">
+            A free Career Reads account takes a few seconds. You&apos;ll come straight back here to send your application.
+          </p>
+          <AuthPanel next={`/jobs/${job.slug}/apply`} />
+        </section>
+      )}
 
       <p className="mt-6 flex items-start gap-2 text-sm text-muted">
         <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-link" aria-hidden />

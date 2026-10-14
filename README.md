@@ -140,6 +140,7 @@ All variables are documented in **[.env.example](.env.example)** and validated a
 | `API_URL` | Optional | The Career Reads API (`blognest-api`), e.g. `http://localhost:4000`. Production deployments (`VERCEL_ENV=production`) default to `https://api.careersreads.com`. When set, articles, authors, jobs, categories and settings come from it; otherwise from `content/` |
 | `SITE_API_KEY` | With `API_URL` | Sent as `X-Api-Key`; same value as `SITE_API_KEY` in the API. Needed for the contact form, newsletter, page counters and draft previews |
 | `REVALIDATE_SECRET` | With `API_URL` | Shared secret the API uses to call `/api/revalidate` after saves |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Optional | "Sign in with Google" for candidate accounts. Same value as `GOOGLE_CLIENT_ID` in the API. Empty: only email and password sign-in |
 
 `NEXT_PUBLIC_*` values are inlined at **build time** — redeploy after changing them. Never put secrets in `NEXT_PUBLIC_*` variables.
 
@@ -256,3 +257,13 @@ Each job is a JSON file in `content/jobs/`, validated by `src/lib/jobs/schema.ts
 
 To manage jobs and posts from a web dashboard instead of files, follow `docs/ADMIN_PANEL_PLAN.md`.
 
+## Candidate accounts
+
+Reading and browsing never need an account. **Applying on Career Reads** does: the apply page offers "Continue with Google" or an email and password account (name, email, password, Terms box), then brings the person straight back to the form.
+
+- The API issues an opaque session token; the site keeps it in the httpOnly `cr_session` cookie and forwards it as `X-Candidate-Session` (`src/lib/candidate/session.ts`, actions in `src/app/account/actions.ts`). Candidate sessions never open the admin.
+- Pages: `/account/sign-in`, `/account` (email status, newsletter, sign out, delete account), `/account/confirm-email` (a button press, so email scanners can't use up the link) and `/account/reset-password`. None are indexed.
+- The header's account button reads `/api/candidate/me` in the browser, so pages stay static. On phones it lives in the menu.
+- An application sent before the email is confirmed is held, hidden from the employer, and sent as soon as they confirm.
+- After applying, people who aren't subscribed are offered the newsletter once ("Not now" waits 30 days). Subscribing sends no extra email.
+- Google setup: Google Cloud Console → APIs & Services → Credentials → OAuth client ID (Web application). Add `https://www.careersreads.com` and `http://localhost:3000` under **Authorized JavaScript origins**. Only the client ID is needed; never put the client secret in either app.

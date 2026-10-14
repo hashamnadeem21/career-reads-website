@@ -35,6 +35,23 @@ export default function TermsPage() {
         <li>Don&apos;t scrape the site in a way that harms its performance.</li>
       </ul>
 
+      <h2>Your account and job applications</h2>
+      <ul>
+        <li>
+          You need a free account to apply for jobs on {siteConfig.name}. Give your real name and an email address you
+          use, keep your password to yourself, and tell us if you think someone else has used your account.
+        </li>
+        <li>
+          Only send true information and documents that are yours. Employers, not {siteConfig.name}, decide who they
+          hire; we don&apos;t guarantee a reply, an interview or a job.
+        </li>
+        <li>Never pay anyone to apply for a job or to get an interview, and report any job that asks you to.</li>
+        <li>
+          You can delete your account at any time from your account page. We may suspend accounts that break these
+          terms or are used to send spam.
+        </li>
+      </ul>
+
       <h2>Third-party links and advertising</h2>
       <p>
         We may link to other websites and display third-party advertising. We are not responsible for the content or

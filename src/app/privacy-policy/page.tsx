@@ -43,6 +43,15 @@ export default async function PrivacyPolicyPage() {
           and answers to the employer&apos;s questions). We share them only with the employer that posted that job, so
           they can consider you for it, and email you a receipt. Your CV is stored privately and is never public.
         </li>
+        <li id="candidate-accounts">
+          <strong>Your account:</strong> applying on {siteConfig.name} needs a free account (reading and browsing
+          never do). If you create one with your email, we keep your name, email address and password, stored only as
+          a one-way hash we can&apos;t read. If you continue with Google, Google shares your name, email address and
+          profile photo with us; we never see your Google password. We record when you signed up, signed in and
+          applied, to keep accounts secure and to understand how the site is used, and we email you once to welcome
+          you and confirm your address. Signing in keeps a cookie on your device that only lets the site know it&apos;s
+          you; it isn&apos;t used for advertising. We add you to the newsletter only if you choose to subscribe.
+        </li>
       </ul>
 
       <h2>Information collected automatically</h2>
@@ -87,6 +96,8 @@ export default async function PrivacyPolicyPage() {
 
       <h2>How long we keep information</h2>
       <p>
+        We keep your account until you delete it, which you can do at any time from your account page; deleting it
+        also deletes your applications, CVs and newsletter subscription. Sign-in sessions end after 60 days.
         We keep newsletter subscriptions until you unsubscribe and contact messages for as long as needed to respond
         and keep a reasonable record of the conversation. Job applications, including CVs, are deleted 6 months
         after the job&apos;s closing date (or 6 months after you applied, if that is later). Analytics data is retained

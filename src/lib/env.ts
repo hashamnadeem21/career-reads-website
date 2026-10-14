@@ -60,6 +60,14 @@ const publicSchema = z.object({
     emptyToUndefined,
     z.email().default("contact@careersreads.com"),
   ),
+  /** The OAuth client ID for "Sign in with Google" (public; the API checks tokens against the same ID). */
+  NEXT_PUBLIC_GOOGLE_CLIENT_ID: z.preprocess(
+    emptyToUndefined,
+    z
+      .string()
+      .regex(/\.apps\.googleusercontent\.com$/, "Google client IDs end with .apps.googleusercontent.com")
+      .optional(),
+  ),
 });
 
 const parsedPublic = publicSchema.safeParse({
@@ -73,6 +81,7 @@ const parsedPublic = publicSchema.safeParse({
   NEXT_PUBLIC_ADSENSE_SLOT_BELOW_ARTICLE: process.env.NEXT_PUBLIC_ADSENSE_SLOT_BELOW_ARTICLE,
   NEXT_PUBLIC_ADSENSE_SLOT_LISTING: process.env.NEXT_PUBLIC_ADSENSE_SLOT_LISTING,
   NEXT_PUBLIC_CONTACT_EMAIL: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
+  NEXT_PUBLIC_GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
 });
 
 if (!parsedPublic.success) {

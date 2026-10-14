@@ -1,9 +1,12 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, CheckCircle2, FileText, Loader2, Send, Upload, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, FileText, Info, Loader2, MailCheck, Send, Upload, X } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState, useTransition, type FormEvent } from "react";
+import { resendConfirmation } from "@/app/account/actions";
 import { submitApplication } from "@/app/jobs/[slug]/apply/actions";
+import { SubscribeDialog } from "@/components/account/SubscribeDialog";
 import { FieldError, SpamGuardFields } from "@/components/forms/SpamGuardFields";
 import { CV_ACCEPT, MAX_CV_BYTES } from "@/lib/apply/limits";
 import { checkAnswer, type FormQuestion } from "@/lib/jobs/questions";
@@ -14,8 +17,9 @@ const inputClass =
 
 /** Contact details kept in this browser only (never sent anywhere until they apply), to speed up the next application. */
 const PROFILE_KEY = "careerreads:apply-profile";
-const PROFILE_FIELDS = ["name", "email", "phone", "location", "linkedinUrl"] as const;
-type Details = Record<(typeof PROFILE_FIELDS)[number] | "coverLetter", string>;
+/** The email always comes from the account, so it isn't remembered here. */
+const PROFILE_FIELDS = ["name", "phone", "location", "linkedinUrl"] as const;
+type Details = Record<(typeof PROFILE_FIELDS)[number] | "email" | "coverLetter", string>;
 const emptyDetails: Details = { name: "", email: "", phone: "", location: "", linkedinUrl: "", coverLetter: "" };
 
 type Errors = Record<string, string>;
@@ -59,17 +63,30 @@ const kb = (bytes: number) => (bytes >= 1_048_576 ? `${(bytes / 1_048_576).toFix
  * questions (when there are any) → check and send. Every step stays mounted, so going back keeps
  * what was typed and the whole form (CV included) is sent at the end.
  */
+/** The signed-in candidate: the name is a starting point, the email is the account's and can't change here. */
+export interface ApplyingCandidate {
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  subscribed: boolean;
+}
+
+type Outcome = { kind: "sent" | "held" | "already"; message: string };
+
 export function ApplyForm({
   slug,
   jobTitle,
   company,
   questions,
+  candidate,
 }: {
   slug: string;
   jobTitle: string;
   company: string;
   questions: FormQuestion[];
+  candidate: ApplyingCandidate;
 }) {
+  const router = useRouter();
   const id = useId();
   const formRef = useRef<HTMLFormElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -77,14 +94,14 @@ export function ApplyForm({
   const [pending, start] = useTransition();
   const steps = ["Your details", "CV", ...(questions.length ? ["Questions"] : []), "Review"];
   const [step, setStep] = useState(0);
-  const [details, setDetails] = useState<Details>(emptyDetails);
+  const [details, setDetails] = useState<Details>({ ...emptyDetails, name: candidate.name, email: candidate.email });
   const [cv, setCv] = useState<File | null>(null);
   const [answers, setAnswers] = useState<AnswerState>({});
   const [consent, setConsent] = useState(false);
   const [remember, setRemember] = useState(true);
   const [errors, setErrors] = useState<Errors>({});
   const [message, setMessage] = useState<string | null>(null);
-  const [sent, setSent] = useState(false);
+  const [outcome, setOutcome] = useState<Outcome | null>(null);
 
   const questionsStep = questions.length ? 2 : -1;
   const reviewStep = steps.length - 1;
@@ -93,11 +110,17 @@ export function ApplyForm({
     mountedAt.current = Date.now();
     try {
       const saved = JSON.parse(localStorage.getItem(PROFILE_KEY) ?? "null") as Partial<Details> | null;
-      if (saved) setDetails((d) => ({ ...d, ...Object.fromEntries(PROFILE_FIELDS.map((k) => [k, String(saved[k] ?? "")])) }));
+      if (saved) {
+        setDetails((d) => ({
+          ...d,
+          ...Object.fromEntries(PROFILE_FIELDS.map((k) => [k, String(saved[k] ?? "") || d[k]])),
+          email: candidate.email,
+        }));
+      }
     } catch {
       // Storage blocked or unreadable: start empty.
     }
-  }, []);
+  }, [candidate.email]);
 
   const goTo = (next: number) => {
     setStep(next);
@@ -137,14 +160,20 @@ export function ApplyForm({
     data.set("cv", cv!, cv!.name);
     start(async () => {
       const result = await submitApplication(slug, data);
-      if (result.status === "success") {
+      if (result.status === "signed_out") {
+        // The page shows sign-in again; what they typed is kept in this browser's memory only.
+        setMessage(result.message);
+        router.refresh();
+        return;
+      }
+      if (result.status === "success" || result.status === "held" || result.status === "already_applied") {
         try {
           if (remember) localStorage.setItem(PROFILE_KEY, JSON.stringify(Object.fromEntries(PROFILE_FIELDS.map((k) => [k, details[k]]))));
           else localStorage.removeItem(PROFILE_KEY);
         } catch {
           // Not remembered; nothing else depends on it.
         }
-        setSent(true);
+        setOutcome({ kind: result.status === "success" ? "sent" : result.status === "held" ? "held" : "already", message: result.message });
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
       }
@@ -156,7 +185,46 @@ export function ApplyForm({
     });
   };
 
-  if (sent) {
+  if (outcome?.kind === "held") {
+    return (
+      <div role="status" className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 sm:p-8">
+        <p className="flex items-center gap-2 text-xl font-semibold text-amber-800 dark:text-amber-200">
+          <MailCheck className="h-6 w-6" aria-hidden /> Almost done: confirm your email
+        </p>
+        <p className="mt-3 leading-relaxed">
+          Your application for <strong>{jobTitle}</strong> is saved. Open the link we emailed to <strong>{candidate.email}</strong> and it goes to {company}{" "}
+          straight away.
+        </p>
+        <ResendLink />
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link href="/jobs" className="inline-flex h-11 items-center gap-2 rounded-full bg-brand px-6 font-semibold text-white hover:opacity-90">
+            Browse more jobs <ArrowRight className="h-4 w-4" aria-hidden />
+          </Link>
+        </div>
+        <SubscribeDialog subscribed={candidate.subscribed} />
+      </div>
+    );
+  }
+
+  if (outcome?.kind === "already") {
+    return (
+      <div role="status" className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
+        <p className="flex items-center gap-2 text-xl font-semibold">
+          <Info className="h-6 w-6 text-link" aria-hidden /> You&apos;ve already applied
+        </p>
+        <p className="mt-3 leading-relaxed">
+          {company} already has your application for <strong>{jobTitle}</strong>, so we didn&apos;t send it twice.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link href="/jobs" className="inline-flex h-11 items-center gap-2 rounded-full bg-brand px-6 font-semibold text-white hover:opacity-90">
+            Browse more jobs <ArrowRight className="h-4 w-4" aria-hidden />
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (outcome?.kind === "sent") {
     return (
       <div role="status" className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-6 sm:p-8">
         <p className="flex items-center gap-2 text-xl font-semibold text-emerald-700 dark:text-emerald-300">
@@ -175,6 +243,7 @@ export function ApplyForm({
             Back to the job
           </Link>
         </div>
+        <SubscribeDialog subscribed={candidate.subscribed} />
       </div>
     );
   }
@@ -207,6 +276,14 @@ export function ApplyForm({
   return (
     <form ref={formRef} onSubmit={submit} noValidate className="relative" data-testid="apply-form">
       <SpamGuardFields />
+      {!candidate.emailVerified && (
+        <p className="mb-6 flex gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm">
+          <MailCheck className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" aria-hidden />
+          <span>
+            Please confirm your email ({candidate.email}) using the link we sent you. You can apply now: your application goes to {company} as soon as you confirm.
+          </span>
+        </p>
+      )}
 
       <ol className="mb-6 flex gap-2" aria-label="Steps">
         {steps.map((name, i) => (
@@ -237,8 +314,17 @@ export function ApplyForm({
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
             {label("email", "Email")}
-            {text("email", { type: "email", autoComplete: "email", inputMode: "email" })}
-            <FieldError id={`${id}-email-error`} errors={err("email")} />
+            <input
+              {...field("email")}
+              type="email"
+              value={details.email}
+              readOnly
+              aria-describedby={`${id}-email-hint`}
+              className={cn(inputClass, "cursor-not-allowed bg-surface text-muted")}
+            />
+            <p id={`${id}-email-hint`} className="mt-1.5 text-sm text-muted">
+              Your account&apos;s email. Employers reply here.
+            </p>
           </div>
           <div>
             {label("phone", "Phone")}
@@ -514,5 +600,25 @@ function QuestionField({
         </p>
       )}
     </div>
+  );
+}
+
+/** "Didn't get it?" for the confirmation email. */
+function ResendLink() {
+  const [pending, start] = useTransition();
+  const [note, setNote] = useState<string | null>(null);
+  return (
+    <p className="mt-3 text-sm">
+      Didn&apos;t get it? Check your spam folder, or{" "}
+      <button
+        type="button"
+        disabled={pending}
+        onClick={() => start(async () => setNote((await resendConfirmation()).message ?? null))}
+        className="font-semibold text-link underline-offset-2 hover:underline disabled:opacity-60"
+      >
+        {pending ? "sending…" : "send it again"}
+      </button>
+      .{note && <span className="mt-2 block text-muted">{note}</span>}
+    </p>
   );
 }

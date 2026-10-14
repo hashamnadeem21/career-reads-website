@@ -31,14 +31,16 @@ export class ApiRequestError extends Error {
 export const hasApi = (): boolean => Boolean(serverEnv().API_URL);
 
 interface CallOptions {
-  method?: "GET" | "POST";
+  method?: "GET" | "POST" | "DELETE";
   query?: Record<string, string | undefined>;
   body?: unknown;
   /** The visitor's address and browser, for the API's per-visitor limits and bot filter. */
   visitor?: { ip?: string | null; userAgent?: string | null };
+  /** A signed-in candidate's session (from the httpOnly cookie), sent as X-Candidate-Session. */
+  candidateSession?: string | null;
 }
 
-async function call(path: string, { method = "GET", query, body, visitor }: CallOptions): Promise<Response> {
+async function call(path: string, { method = "GET", query, body, visitor, candidateSession }: CallOptions): Promise<Response> {
   const { API_URL, SITE_API_KEY } = serverEnv();
   if (!API_URL) throw new Error("API_URL is not set");
   const url = new URL(path, `${API_URL}/`);
@@ -48,6 +50,7 @@ async function call(path: string, { method = "GET", query, body, visitor }: Call
   if (SITE_API_KEY) headers["x-api-key"] = SITE_API_KEY;
   if (visitor?.ip) headers["x-client-ip"] = visitor.ip;
   if (visitor?.userAgent) headers["x-client-user-agent"] = visitor.userAgent;
+  if (candidateSession) headers["x-candidate-session"] = candidateSession;
   const isForm = body instanceof FormData;
   if (body !== undefined && !isForm) headers["content-type"] = "application/json";
 
@@ -87,4 +90,17 @@ export async function apiGet<T>(path: string, query?: CallOptions["query"]): Pro
 /** POST JSON (or FormData, as multipart). Resolves when the API accepted it; throws ApiRequestError otherwise. */
 export async function apiPost(path: string, body: unknown, visitor?: CallOptions["visitor"]): Promise<void> {
   await call(path, { method: "POST", body, visitor });
+}
+
+/**
+ * Any method, returning the JSON answer (null for 204 No Content). Throws ApiRequestError when the
+ * API refuses, so callers can show its message and field errors.
+ */
+export async function apiSend<T>(
+  path: string,
+  options: Omit<CallOptions, "query"> & { method: "GET" | "POST" | "DELETE" },
+): Promise<T | null> {
+  const response = await call(path, options);
+  if (response.status === 204) return null;
+  return (await response.json()) as T;
 }
