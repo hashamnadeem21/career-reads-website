@@ -1,4 +1,4 @@
-import { Building2, CalendarDays, Clock, ExternalLink, GraduationCap, Mail, MapPin, Wallet } from "lucide-react";
+import { Building2, CalendarDays, Clock, ExternalLink, GraduationCap, Mail, MapPin, Wallet, Zap } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -55,25 +55,45 @@ function Section({ title, items }: { title: string; items: string[] }) {
   );
 }
 
-function ApplyButton({ job }: { job: Job }) {
-  const className =
+/**
+ * How to apply. A job that takes applications on Career Reads gets "Apply on Career Reads" first,
+ * with the employer's own link or email underneath when there is one (like LinkedIn's Easy Apply).
+ */
+function ApplyButtons({ job }: { job: Job }) {
+  const primary =
     "inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-5 py-3 font-semibold text-white hover:opacity-90";
+  const secondary =
+    "inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border px-5 py-2.5 text-sm font-semibold hover:bg-surface";
   const statPath = `/jobs/${job.slug}`;
-  if (job.applyUrl) {
-    return (
-      <TrackedApplyLink statPath={statPath} href={job.applyUrl} target="_blank" rel="noopener noreferrer nofollow" className={className}>
-        Apply now <ExternalLink className="h-4 w-4" aria-hidden />
-      </TrackedApplyLink>
-    );
-  }
-  return (
+  const external = job.applyUrl ? (
+    <TrackedApplyLink
+      statPath={statPath}
+      href={job.applyUrl}
+      target="_blank"
+      rel="noopener noreferrer nofollow"
+      className={job.onsiteApply ? secondary : primary}
+    >
+      {job.onsiteApply ? "Apply on company site" : "Apply now"} <ExternalLink className="h-4 w-4" aria-hidden />
+    </TrackedApplyLink>
+  ) : job.applyEmail ? (
     <TrackedApplyLink
       statPath={statPath}
       href={`mailto:${job.applyEmail}?subject=${encodeURIComponent(`Application: ${job.title}`)}`}
-      className={className}
+      className={job.onsiteApply ? secondary : primary}
     >
       <Mail className="h-4 w-4" aria-hidden /> Apply by email
     </TrackedApplyLink>
+  ) : null;
+
+  if (!job.onsiteApply) return external;
+  return (
+    <div className="space-y-2.5">
+      <TrackedApplyLink statPath={statPath} href={`/jobs/${job.slug}/apply`} className={primary}>
+        <Zap className="h-4 w-4" aria-hidden /> Apply on Career Reads
+      </TrackedApplyLink>
+      <p className="text-center text-xs text-muted">Send your CV in a minute, no account needed</p>
+      {external}
+    </div>
   );
 }
 
@@ -153,7 +173,7 @@ export default async function JobPage({ params }: Props) {
             )}
 
             <div className="mt-10 max-w-xs lg:hidden">
-              <ApplyButton job={job} />
+              <ApplyButtons job={job} />
             </div>
             <p className="mt-8 rounded-lg bg-surface p-4 text-sm text-muted">
               Never pay anyone to apply for a job. If an employer asks you for money, please{" "}
@@ -180,7 +200,7 @@ export default async function JobPage({ params }: Props) {
                   ))}
                 </dl>
                 <div className="mt-6">
-                  <ApplyButton job={job} />
+                  <ApplyButtons job={job} />
                 </div>
               </div>
               <AdSlot placement="sidebar" className="my-0 hidden lg:block" />
