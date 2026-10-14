@@ -38,7 +38,7 @@ export async function Footer() {
           <Logo />
           <p className="mt-4 text-sm leading-relaxed text-muted">{siteConfig.description}</p>
           <Link
-            href="/rss.xml"
+            href="/subscribe"
             prefetch={false}
             className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-link hover:underline"
           >
