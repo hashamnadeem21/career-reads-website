@@ -137,10 +137,20 @@ export default async function JobPage({ params }: Props) {
               </div>
             </header>
 
-            <p className="mt-8 text-lg leading-relaxed">{job.summary}</p>
-            <Section title="Responsibilities" items={job.responsibilities} />
-            <Section title="Requirements" items={job.requirements} />
-            <Section title="Benefits" items={job.benefits} />
+            {job.description ? (
+              // Formatted in the admin's editor; the API sanitizes it on save and again when serving it.
+              <div
+                className="prose prose-lg prose-article mt-8 max-w-none dark:prose-invert [&_li>p]:my-0"
+                dangerouslySetInnerHTML={{ __html: job.description }}
+              />
+            ) : (
+              <>
+                <p className="mt-8 text-lg leading-relaxed">{job.summary}</p>
+                <Section title="Responsibilities" items={job.responsibilities} />
+                <Section title="Requirements" items={job.requirements} />
+                <Section title="Benefits" items={job.benefits} />
+              </>
+            )}
 
             <div className="mt-10 max-w-xs lg:hidden">
               <ApplyButton job={job} />
