@@ -7,7 +7,11 @@ export const MAX_CV_BYTES = 4 * 1024 * 1024;
 export const CV_ACCEPT = ".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
 export interface ApplyResult {
-  status: "success" | "error";
+  /**
+   * success: sent to the employer. held: waits until they confirm their email. already_applied:
+   * one application per job. signed_out: their session ended, so they sign in again.
+   */
+  status: "success" | "held" | "already_applied" | "signed_out" | "error";
   message: string;
   /** Field errors from the API, keyed like its fields (`answers.<question id>` for answers). */
   fieldErrors?: Record<string, string>;

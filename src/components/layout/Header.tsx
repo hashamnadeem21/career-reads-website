@@ -1,5 +1,6 @@
 import { Search } from "lucide-react";
 import Link from "next/link";
+import { AccountMenu } from "@/components/account/AccountMenu";
 import { categoryList } from "@/lib/categories";
 import { ensureSiteData } from "@/lib/site-data";
 import { siteConfig } from "@/lib/site";
@@ -28,6 +29,10 @@ export async function Header() {
             <Search className="h-[18px] w-[18px]" aria-hidden />
             <span className="hidden sm:inline">Search</span>
           </Link>
+          {/* On phones the account link lives in the menu, so the header fits at 360px. */}
+          <div className="hidden sm:block">
+            <AccountMenu />
+          </div>
           <ThemeToggle />
           <MobileNav items={siteConfig.nav} categories={categoryLinks} />
         </div>

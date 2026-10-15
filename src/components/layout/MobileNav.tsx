@@ -5,6 +5,7 @@ import { AnimatePresence, m } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
+import { AccountMenu } from "@/components/account/AccountMenu";
 import { cn } from "@/lib/utils";
 import { isActivePath, type NavItem } from "./NavLinks";
 
@@ -76,6 +77,9 @@ export function MobileNav({ items, categories }: { items: readonly NavItem[]; ca
               <Search className="h-4 w-4" aria-hidden />
               Search articles…
             </Link>
+            <div className="sm:hidden">
+              <AccountMenu variant="mobile" />
+            </div>
             <nav aria-label="Mobile">
               <ul className="space-y-1">
                 {items.map((item) => (
