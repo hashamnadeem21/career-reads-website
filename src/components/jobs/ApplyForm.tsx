@@ -9,6 +9,8 @@ import { submitApplication } from "@/app/jobs/[slug]/apply/actions";
 import { SubscribeDialog } from "@/components/account/SubscribeDialog";
 import { FieldError, SpamGuardFields } from "@/components/forms/SpamGuardFields";
 import { CV_ACCEPT, MAX_CV_BYTES } from "@/lib/apply/limits";
+import { shortDate } from "@/lib/candidate/application-status";
+import type { SavedCv } from "@/lib/candidate/types";
 import { checkAnswer, type FormQuestion } from "@/lib/jobs/questions";
 import { cn } from "@/lib/utils";
 
@@ -79,12 +81,15 @@ export function ApplyForm({
   company,
   questions,
   candidate,
+  savedCv = null,
 }: {
   slug: string;
   jobTitle: string;
   company: string;
   questions: FormQuestion[];
   candidate: ApplyingCandidate;
+  /** The CV on their account: offered (and picked) first, so applying again needs no upload. */
+  savedCv?: SavedCv | null;
 }) {
   const router = useRouter();
   const id = useId();
@@ -96,6 +101,8 @@ export function ApplyForm({
   const [step, setStep] = useState(0);
   const [details, setDetails] = useState<Details>({ ...emptyDetails, name: candidate.name, email: candidate.email });
   const [cv, setCv] = useState<File | null>(null);
+  const [useSaved, setUseSaved] = useState(Boolean(savedCv));
+  const sendSaved = useSaved && savedCv !== null;
   const [answers, setAnswers] = useState<AnswerState>({});
   const [consent, setConsent] = useState(false);
   const [remember, setRemember] = useState(true);
@@ -130,7 +137,7 @@ export function ApplyForm({
 
   const stepErrors = (index: number): Errors => {
     if (index === 0) return checkDetails(details);
-    if (index === 1) return checkCvFile(cv);
+    if (index === 1) return sendSaved ? {} : checkCvFile(cv);
     if (index === questionsStep) return checkQuestions(questions, answers);
     return consent ? {} : { consent: "Please agree so the employer can see your application" };
   };
@@ -157,7 +164,12 @@ export function ApplyForm({
     data.set("answers", JSON.stringify(answers));
     data.set("consent", "true");
     data.set("startedAt", String(mountedAt.current));
-    data.set("cv", cv!, cv!.name);
+    if (sendSaved) {
+      data.delete("cv");
+      data.set("useSavedCv", "true");
+    } else {
+      data.set("cv", cv!, cv!.name);
+    }
     start(async () => {
       const result = await submitApplication(slug, data);
       if (result.status === "signed_out") {
@@ -178,6 +190,7 @@ export function ApplyForm({
         return;
       }
       const fieldErrors = result.fieldErrors ?? {};
+      if (fieldErrors.cv && sendSaved) setUseSaved(false); // the saved CV has gone: upload one instead
       setErrors(fieldErrors);
       setMessage(result.message);
       const firstField = Object.keys(fieldErrors)[0];
@@ -350,11 +363,49 @@ export function ApplyForm({
       <div hidden={step !== 1} className="mt-5 space-y-5">
         <div>
           <span className="mb-1.5 block text-sm font-medium">CV</span>
+          {savedCv && (
+            <fieldset className="mb-3 space-y-2">
+              <legend className="sr-only">Which CV to send</legend>
+              {[
+                { saved: true, title: "Use my saved CV", detail: `${savedCv.name} · ${kb(savedCv.sizeBytes)} · uploaded ${shortDate(savedCv.uploadedAt)}` },
+                { saved: false, title: "Upload a different CV", detail: "It also becomes your saved CV for next time." },
+              ].map((option) => (
+                <label
+                  key={option.title}
+                  className={cn(
+                    "flex cursor-pointer items-start gap-3 rounded-2xl border px-4 py-3 transition hover:bg-surface",
+                    useSaved === option.saved ? "border-brand ring-1 ring-brand" : "border-border",
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="cvChoice"
+                    className="mt-1 accent-brand"
+                    checked={useSaved === option.saved}
+                    onChange={() => {
+                      setUseSaved(option.saved);
+                      setErrors((current) => Object.fromEntries(Object.entries(current).filter(([key]) => key !== "cv")));
+                    }}
+                  />
+                  <span className="min-w-0">
+                    <span className="block font-medium">{option.title}</span>
+                    <span className="block truncate text-sm text-muted">{option.detail}</span>
+                  </span>
+                </label>
+              ))}
+              {useSaved && (
+                <a href="/account/cv" target="_blank" rel="noopener" className="inline-block text-sm font-medium text-link hover:underline">
+                  View my saved CV
+                </a>
+              )}
+            </fieldset>
+          )}
           <label
             htmlFor={`${id}-cv`}
             className={cn(
-              "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-6 py-8 text-center transition hover:border-brand hover:bg-surface",
+              "cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-6 py-8 text-center transition hover:border-brand hover:bg-surface",
               errors.cv ? "border-rose-500" : "border-border",
+              sendSaved ? "hidden" : "flex",
             )}
           >
             {cv ? (
@@ -367,7 +418,7 @@ export function ApplyForm({
               <>
                 <Upload className="h-8 w-8 text-link" aria-hidden />
                 <span className="font-medium">Upload your CV</span>
-                <span className="text-sm text-muted">PDF or Word (.docx), up to 4 MB</span>
+                <span className="text-sm text-muted">PDF or Word (.docx), up to 4 MB{savedCv ? "" : ". We'll save it for next time."}</span>
               </>
             )}
           </label>
@@ -429,7 +480,7 @@ export function ApplyForm({
             ["Phone", details.phone],
             ...(details.location ? [["Location", details.location]] : []),
             ...(details.linkedinUrl ? [["LinkedIn", details.linkedinUrl]] : []),
-            ["CV", cv ? `${cv.name} (${kb(cv.size)})` : "—"],
+            ["CV", sendSaved ? `${savedCv.name} (saved CV)` : cv ? `${cv.name} (${kb(cv.size)})` : "—"],
             ...questions.map((q) => {
               const a = answers[q.id];
               const shown = Array.isArray(a) ? a.join(", ") : a === "yes" ? "Yes" : a === "no" ? "No" : a;

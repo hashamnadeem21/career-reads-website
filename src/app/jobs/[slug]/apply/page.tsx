@@ -6,7 +6,7 @@ import { AuthPanel } from "@/components/account/AuthPanel";
 import { ApplyForm } from "@/components/jobs/ApplyForm";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { apiGet, apiPath, hasApi } from "@/lib/api/client";
-import { currentCandidate } from "@/lib/candidate/session";
+import { currentCandidate, myApplications } from "@/lib/candidate/session";
 import { googleClientId } from "@/lib/env";
 import { getJobBySlug, jobLocation } from "@/lib/jobs";
 import type { FormQuestion } from "@/lib/jobs/questions";
@@ -39,7 +39,7 @@ export default async function ApplyPage({ params }: Props) {
   const { slug } = await params;
   const job = await getJobBySlug(slug);
   if (!job?.onsiteApply) notFound();
-  const [form, candidate] = await Promise.all([getApplicationForm(slug), currentCandidate()]);
+  const [form, candidate, mine] = await Promise.all([getApplicationForm(slug), currentCandidate(), myApplications()]);
   if (!form) notFound();
 
   return (
@@ -76,6 +76,7 @@ export default async function ApplyPage({ params }: Props) {
             jobTitle={job.title}
             company={job.company}
             questions={form.questions}
+            savedCv={mine?.cv ?? null}
             candidate={{ name: candidate.name, email: candidate.email, emailVerified: candidate.emailVerified, subscribed: candidate.subscribed }}
           />
         </section>

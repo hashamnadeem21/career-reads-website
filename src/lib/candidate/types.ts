@@ -10,6 +10,35 @@ export interface Candidate {
   subscribed: boolean;
 }
 
+/** The CV saved on their account, offered when they apply. */
+export interface SavedCv {
+  name: string;
+  contentType: string;
+  sizeBytes: number;
+  uploadedAt: string;
+}
+
+/** The employer's status for an application (set in the admin). */
+export type ApplicationStatus = "new" | "reviewed" | "shortlisted" | "interviewing" | "offered" | "hired" | "rejected" | "withdrawn";
+
+/** One of their applications, as the API returns it. */
+export interface MyApplication {
+  id: string;
+  job: { title: string; company: string; slug: string; open: boolean };
+  status: ApplicationStatus;
+  /** Not sent yet: it goes to the employer once they confirm their email. */
+  awaitingConfirmation: boolean;
+  appliedAt: string;
+  statusChangedAt: string;
+  /** The CV sent with this application. */
+  cv: { name: string } | null;
+}
+
+export interface MyApplications {
+  cv: SavedCv | null;
+  applications: MyApplication[];
+}
+
 /** What a sign-in, sign-up or account action tells the form. */
 export type AuthResult =
   | { status: "success"; message?: string; candidate?: Candidate; created?: boolean }

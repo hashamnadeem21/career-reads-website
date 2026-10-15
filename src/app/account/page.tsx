@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AccountDetails } from "@/components/account/AccountDetails";
-import { currentCandidate } from "@/lib/candidate/session";
+import { MyApplications } from "@/components/account/MyApplications";
+import { MyCv } from "@/components/account/MyCv";
+import { currentCandidate, myApplications } from "@/lib/candidate/session";
 import { pageTitle } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -11,8 +13,9 @@ export const metadata: Metadata = {
 
 type Props = { searchParams: Promise<{ reset?: string }> };
 
+/** Their applications with the employer's status, their saved CV, then account settings. */
 export default async function AccountPage({ searchParams }: Props) {
-  const candidate = await currentCandidate();
+  const [candidate, mine] = await Promise.all([currentCandidate(), myApplications()]);
   if (!candidate) redirect("/account/sign-in?mode=signin&next=/account");
   const { reset } = await searchParams;
 
@@ -24,6 +27,17 @@ export default async function AccountPage({ searchParams }: Props) {
           Your new password is saved and you&apos;re signed in.
         </p>
       )}
+      {mine ? (
+        <>
+          <MyApplications applications={mine.applications} />
+          <MyCv cv={mine.cv} />
+        </>
+      ) : (
+        <p role="status" className="mt-6 rounded-xl bg-amber-500/10 px-4 py-3 text-sm text-amber-800 dark:text-amber-200">
+          We couldn&apos;t load your applications just now. Please refresh the page in a minute.
+        </p>
+      )}
+      <h2 className="mt-10 text-xl font-semibold">Account settings</h2>
       <AccountDetails candidate={candidate} />
     </div>
   );

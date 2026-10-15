@@ -30,9 +30,12 @@ export async function submitApplication(slug: string, formData: FormData): Promi
     return { status: "error", message: "That was quick! Please press the button again to send your application." };
   }
 
-  const cv = formData.get("cv");
-  if (!(cv instanceof File) || cv.size === 0) return { status: "error", message: "Attach your CV.", fieldErrors: { cv: "Attach your CV" } };
-  if (cv.size > MAX_CV_BYTES) {
+  // A new file, or "use my saved CV" (the API sends the one on their account).
+  const file = formData.get("cv");
+  const cv = file instanceof File && file.size > 0 ? file : null;
+  const useSavedCv = !cv && formData.get("useSavedCv") === "true";
+  if (!cv && !useSavedCv) return { status: "error", message: "Attach your CV.", fieldErrors: { cv: "Attach your CV" } };
+  if (cv && cv.size > MAX_CV_BYTES) {
     return { status: "error", message: "Your CV is too large.", fieldErrors: { cv: "Your CV must be 4 MB or smaller" } };
   }
 
@@ -41,7 +44,8 @@ export async function submitApplication(slug: string, formData: FormData): Promi
     const value = formData.get(field);
     if (typeof value === "string" && value !== "") body.set(field, value);
   }
-  body.set("cv", cv, cv.name);
+  if (cv) body.set("cv", cv, cv.name);
+  else body.set("useSavedCv", "true");
 
   const h = await headers();
   const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || null;

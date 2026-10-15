@@ -1,8 +1,9 @@
 "use server";
 
 import { ApiRequestError, apiSend, hasApi } from "@/lib/api/client";
+import { MAX_CV_BYTES } from "@/lib/apply/limits";
 import { clearSession, type IssuedSession, sessionToken, storeSession, visitor } from "@/lib/candidate/session";
-import type { AuthResult, Candidate } from "@/lib/candidate/types";
+import type { AuthResult, Candidate, SavedCv } from "@/lib/candidate/types";
 
 /**
  * Candidate accounts: each action calls the API with the site's key (and the visitor's address for
@@ -42,12 +43,17 @@ async function signIn(path: string, body: unknown, what: string): Promise<AuthRe
 }
 
 /** Calls an endpoint that needs the signed-in candidate; a dead session clears the cookie. */
-async function asCandidate<T>(path: string, method: "GET" | "POST" | "DELETE", what: string): Promise<{ ok: true; data: T | null } | { ok: false; result: AuthResult }> {
+async function asCandidate<T>(
+  path: string,
+  method: "GET" | "POST" | "DELETE",
+  what: string,
+  body?: FormData,
+): Promise<{ ok: true; data: T | null } | { ok: false; result: AuthResult }> {
   if (!hasApi()) return { ok: false, result: UNAVAILABLE };
   const token = await sessionToken();
   if (!token) return { ok: false, result: SIGNED_OUT };
   try {
-    return { ok: true, data: await apiSend<T>(path, { method, candidateSession: token, visitor: await visitor() }) };
+    return { ok: true, data: await apiSend<T>(path, { method, body, candidateSession: token, visitor: await visitor() }) };
   } catch (error) {
     if (error instanceof ApiRequestError && error.status === 401) {
       await clearSession();
@@ -132,6 +138,25 @@ export async function signOut(): Promise<AuthResult> {
   }
   await clearSession();
   return { status: "success" };
+}
+
+/** Saves a new CV on their account, in place of the old one. Applications already sent keep theirs. */
+export async function uploadCv(_prev: AuthResult | null, formData: FormData): Promise<AuthResult> {
+  const cv = formData.get("cv");
+  if (!(cv instanceof File) || cv.size === 0) return { status: "error", message: "Choose your CV.", fieldErrors: { cv: "Choose your CV" } };
+  if (!/\.(pdf|docx)$/i.test(cv.name)) {
+    return { status: "error", message: "Upload your CV as a PDF or Word (.docx) document.", fieldErrors: { cv: "Upload your CV as a PDF or Word (.docx) document" } };
+  }
+  if (cv.size > MAX_CV_BYTES) return { status: "error", message: "Your CV must be 4 MB or smaller.", fieldErrors: { cv: "Your CV must be 4 MB or smaller" } };
+  const body = new FormData();
+  body.set("cv", cv, cv.name);
+  const res = await asCandidate<{ cv: SavedCv }>("/public/candidate/cv", "POST", "upload CV", body);
+  return res.ok ? { status: "success", message: "Your CV is saved. We'll use it next time you apply." } : res.result;
+}
+
+export async function removeCv(): Promise<AuthResult> {
+  const res = await asCandidate("/public/candidate/cv", "DELETE", "remove CV");
+  return res.ok ? { status: "success", message: "Your CV is removed from your account." } : res.result;
 }
 
 export async function deleteAccount(_prev: AuthResult | null, formData: FormData): Promise<AuthResult> {

@@ -724,6 +724,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/public/candidate/applications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MyApplicationsController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/candidate/applications/{id}/cv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MyApplicationsController_applicationCv"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/candidate/cv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MyApplicationsController_cv"];
+        put?: never;
+        post: operations["MyApplicationsController_replaceCv"];
+        delete: operations["MyApplicationsController_removeCv"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/candidate/auth/google": {
         parameters: {
             query?: never;
@@ -3050,6 +3098,122 @@ export interface operations {
         };
         responses: {
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MyApplicationsController_list: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The candidate's session token */
+                "x-candidate-session": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MyApplicationsController_applicationCv: {
+        parameters: {
+            query?: {
+                download?: "true" | "false";
+            };
+            header: {
+                /** @description The candidate's session token */
+                "x-candidate-session": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MyApplicationsController_cv: {
+        parameters: {
+            query?: {
+                download?: "true" | "false";
+            };
+            header: {
+                /** @description The candidate's session token */
+                "x-candidate-session": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MyApplicationsController_replaceCv: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The candidate's session token */
+                "x-candidate-session": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description PDF or DOCX, up to 5 MB
+                     */
+                    cv: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MyApplicationsController_removeCv: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The candidate's session token */
+                "x-candidate-session": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
