@@ -39,12 +39,18 @@ export function metaDescription(text: string, limit = DESCRIPTION_LIMIT): string
 }
 
 /** Consistent metadata for every indexable page: unique title/description, canonical, OG, Twitter. */
+/**
+ * The site's own share image (app/opengraph-image.tsx). Pages that set their own Open Graph
+ * fields replace the inherited image, so they name it explicitly unless they have a better one.
+ */
+export function defaultOgImage() {
+  return { url: absoluteUrl("/opengraph-image"), width: 1200, height: 630, alt: `${siteConfig.name}: ${siteConfig.tagline}` };
+}
+
 export function buildMetadata({ title, description: rawDescription, path, image, noindex, absoluteTitle }: PageMetadataInput): Metadata {
   const url = absoluteUrl(path);
   const description = metaDescription(rawDescription);
-  const images = image
-    ? [{ url: image.url, alt: image.alt, width: image.width ?? 1200, height: image.height ?? 630 }]
-    : undefined;
+  const images = image ? [{ url: image.url, alt: image.alt, width: image.width ?? 1200, height: image.height ?? 630 }] : [defaultOgImage()];
 
   return {
     title: absoluteTitle ? { absolute: title } : pageTitle(title),
@@ -57,13 +63,13 @@ export function buildMetadata({ title, description: rawDescription, path, image,
       description,
       siteName: siteConfig.name,
       locale: siteConfig.locale,
-      ...(images && { images }),
+      images,
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      ...(images && { images: images.map((i) => i.url) }),
+      images: images.map((i) => i.url),
     },
     ...(noindex && { robots: { index: false, follow: true } }),
   };

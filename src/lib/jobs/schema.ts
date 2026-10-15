@@ -67,3 +67,14 @@ export function jobLocation(job: Pick<Job, "city" | "country" | "workModel">): s
   const place = job.city ? `${job.city}, ${job.country}` : job.country;
   return job.workModel === "remote" && !job.city ? `Remote · ${place}` : place;
 }
+
+/**
+ * The job page's <title>: "Role at Company, Place" when that fits the ~60 characters search
+ * results show, otherwise "Role at Company". The page itself still shows the full location.
+ */
+export function jobTitleTag(job: Pick<Job, "title" | "company" | "city" | "country" | "workModel">, limit = 60): string {
+  const base = `${job.title} at ${job.company}`;
+  const place = job.workModel === "remote" ? "Remote" : (job.city ?? job.country);
+  const withPlace = `${base}, ${place}`;
+  return withPlace.length <= limit ? withPlace : base;
+}

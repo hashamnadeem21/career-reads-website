@@ -3,6 +3,7 @@ import Link from "next/link";
 import { categoryList } from "@/lib/categories";
 import { ensureSiteData } from "@/lib/site-data";
 import { siteConfig } from "@/lib/site";
+import { SocialLinks } from "./SocialLinks";
 import { Logo } from "./Logo";
 
 /**
@@ -44,6 +45,8 @@ export async function Footer() {
           >
             <Rss className="h-4 w-4" aria-hidden /> Subscribe via RSS
           </Link>
+          <p className="mt-6 text-sm font-semibold">Follow us</p>
+          <SocialLinks className="mt-3" />
         </div>
         <FooterColumn title="Jobs" links={siteConfig.footer.jobs} />
         <FooterColumn title="Read" links={categoryLinks} />

@@ -9,7 +9,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { hasApi } from "@/lib/api/client";
-import { getJobBySlug, getJobs, getRelatedJobs, jobLocation, type Job } from "@/lib/jobs";
+import { getJobBySlug, getJobs, getRelatedJobs, jobLocation, jobTitleTag, type Job } from "@/lib/jobs";
 import { employmentTypeLabels, experienceLabels, jobCategories, workModelLabels } from "@/lib/jobs/categories";
 import { jobPostingJsonLd } from "@/lib/jsonld";
 import { metaDescription, pageTitle } from "@/lib/seo";
@@ -27,16 +27,18 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const job = await getJobBySlug((await params).slug);
   if (!job) return { title: "Job not found", robots: { index: false } };
-  // "Frontend Developer at Acme in Lahore, Pakistan": the role, the employer and the place people search for.
-  const title = `${job.title} at ${job.company} in ${jobLocation(job)}`;
+  // "Frontend Developer at Acme, Lahore" for search results (they show ~60 characters); shares get
+  // the full "… in Lahore, Pakistan" and the job's own image (opengraph-image.tsx next to this page).
+  const title = jobTitleTag(job);
+  const shareTitle = `${job.title} at ${job.company} in ${jobLocation(job)}`;
   const description = metaDescription(job.summary);
   const url = absoluteUrl(`/jobs/${job.slug}`);
   return {
     title: pageTitle(title),
     description,
     alternates: { canonical: url },
-    openGraph: { type: "website", url, title, description },
-    twitter: { card: "summary_large_image", title, description },
+    openGraph: { type: "website", url, title: shareTitle, description },
+    twitter: { card: "summary_large_image", title: shareTitle, description },
     ...(job.sample && { robots: { index: false, follow: false } }),
   };
 }
