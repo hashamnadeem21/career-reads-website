@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, UserRound } from "lucide-react";
+import { Briefcase, FileText, LogOut, Settings, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useId, useRef, useState, useTransition } from "react";
@@ -114,9 +114,16 @@ export function AccountMenu({ variant = "header" }: { variant?: "header" | "mobi
             <p className="truncate text-sm text-muted">{me.email}</p>
           </div>
           <div className="my-1 h-px bg-border" />
-          <Link href="/account" className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm hover:bg-surface">
-            <UserRound className="h-4 w-4" aria-hidden /> My account
-          </Link>
+          {[
+            { href: "/account", label: "My applications", Icon: Briefcase },
+            { href: "/account/cv", label: "My CV", Icon: FileText },
+            { href: "/account/settings", label: "Account settings", Icon: Settings },
+          ].map(({ href, label, Icon }) => (
+            <Link key={href} href={href} onClick={() => setOpen(false)} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm hover:bg-surface">
+              <Icon className="h-4 w-4" aria-hidden /> {label}
+            </Link>
+          ))}
+          <div className="my-1 h-px bg-border" />
           <button
             type="button"
             onClick={() =>

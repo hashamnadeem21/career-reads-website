@@ -1,4 +1,4 @@
-import { Briefcase, Building2, CalendarDays, FileText } from "lucide-react";
+import { Building2, CalendarDays, FileText } from "lucide-react";
 import Link from "next/link";
 import { applicationStatus, shortDate, type StatusTone } from "@/lib/candidate/application-status";
 import type { MyApplication } from "@/lib/candidate/types";
@@ -15,14 +15,9 @@ const tones: Record<StatusTone, string> = {
 /** Their applications, newest first, each with the employer's status in plain words. */
 export function MyApplications({ applications }: { applications: MyApplication[] }) {
   return (
-    <section className="mt-8" aria-labelledby="my-applications">
-      <h2 id="my-applications" className="flex items-center gap-2 text-xl font-semibold">
-        <Briefcase className="h-5 w-5 text-link" aria-hidden /> My applications
-        {applications.length > 0 && <span className="text-base font-normal text-muted">({applications.length})</span>}
-      </h2>
-
+    <>
       {applications.length === 0 ? (
-        <div className="mt-4 rounded-2xl border border-dashed border-border p-6 text-center">
+        <div className="rounded-2xl border border-dashed border-border p-6 text-center">
           <p className="font-medium">You haven&apos;t applied for any jobs yet.</p>
           <p className="mt-1 text-sm text-muted">Jobs you apply for on Career Reads show up here, with what the employer has decided.</p>
           <Link href="/jobs" className="mt-4 inline-flex h-10 items-center rounded-full bg-brand px-5 text-sm font-semibold text-white hover:opacity-90">
@@ -30,13 +25,13 @@ export function MyApplications({ applications }: { applications: MyApplication[]
           </Link>
         </div>
       ) : (
-        <ul className="mt-4 space-y-3" data-testid="my-applications">
+        <ul className="space-y-3" data-testid="my-applications">
           {applications.map((application) => (
             <ApplicationItem key={application.id} application={application} />
           ))}
         </ul>
       )}
-    </section>
+    </>
   );
 }
 
