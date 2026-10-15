@@ -1,5 +1,6 @@
 import { Briefcase, CalendarClock, GraduationCap, Laptop, Search } from "lucide-react";
 import type { Metadata } from "next";
+import { defaultOgImage } from "@/lib/seo";
 import Link from "next/link";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { JobList } from "@/components/jobs/JobCard";
@@ -68,11 +69,11 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   return {
     title,
     description,
-    alternates: { canonical: absoluteUrl("/jobs") },
-    openGraph: { type: "website", url: absoluteUrl("/jobs"), title, description },
-    twitter: { card: "summary_large_image", title, description },
-    // Filtered views are variations of /jobs and should not be indexed separately.
-    ...(filtered && { robots: { index: false, follow: true } }),
+    // Filtered views are variations of /jobs: kept out of the index (noindex alone; pointing their
+    // canonical at /jobs as well would send Google two different signals).
+    ...(filtered ? { robots: { index: false, follow: true } } : { alternates: { canonical: absoluteUrl("/jobs") } }),
+    openGraph: { type: "website", url: absoluteUrl("/jobs"), title, description, images: [defaultOgImage()] },
+    twitter: { card: "summary_large_image", title, description, images: [defaultOgImage().url] },
   };
 }
 

@@ -1,7 +1,8 @@
-import { Mail, MessageSquareText, PenLine } from "lucide-react";
+import { Mail, MessageSquareText, PenLine, Share2 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ContactForm } from "@/components/forms/ContactForm";
+import { SocialLinks } from "@/components/layout/SocialLinks";
 import { PageHeader } from "@/components/ui/SectionHeading";
 import { buildMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
@@ -64,6 +65,16 @@ export default async function ContactPage() {
               </div>
             </div>
           ))}
+          <div className="flex gap-4 rounded-2xl border border-border p-5">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-strong text-link">
+              <Share2 className="h-5 w-5" aria-hidden />
+            </span>
+            <div>
+              <h2 className="font-semibold">Follow us</h2>
+              <p className="mt-1 text-sm text-muted">New jobs and guides, as they&apos;re published.</p>
+              <SocialLinks className="mt-3" />
+            </div>
+          </div>
         </div>
         <div className="rounded-3xl border border-border bg-surface p-6 sm:p-8">
           <h2 className="mb-6 font-display text-2xl font-semibold">Send a message</h2>

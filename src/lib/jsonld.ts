@@ -1,6 +1,7 @@
 import { categories } from "@/lib/categories";
 import type { Article, Author } from "@/lib/content";
 import type { Job } from "@/lib/jobs/schema";
+import { parseSalary } from "@/lib/jobs/salary";
 import { absoluteUrl, siteConfig } from "@/lib/site";
 
 const ORG_ID = `${siteConfig.url}/#organization`;
@@ -135,6 +136,7 @@ function htmlList(title: string, items: string[]): string {
 export function jobPostingJsonLd(job: Job) {
   const url = absoluteUrl(`/jobs/${job.slug}`);
   const remote = job.workModel === "remote";
+  const salary = parseSalary(job.salary);
   return {
     "@context": "https://schema.org",
     "@type": "JobPosting",
@@ -172,6 +174,18 @@ export function jobPostingJsonLd(job: Job) {
             },
           },
         }),
+    identifier: { "@type": "PropertyValue", name: siteConfig.name, value: job.slug },
+    ...(salary && {
+      baseSalary: {
+        "@type": "MonetaryAmount",
+        currency: salary.currency,
+        value: {
+          "@type": "QuantitativeValue",
+          ...(salary.max === undefined ? { value: salary.min } : { minValue: salary.min, maxValue: salary.max }),
+          unitText: salary.unit,
+        },
+      },
+    }),
     // Applying on Career Reads itself counts as direct apply for Google for Jobs.
     directApply: Boolean(job.onsiteApply),
   };

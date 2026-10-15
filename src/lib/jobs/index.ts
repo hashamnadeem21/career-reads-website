@@ -13,7 +13,7 @@ import { jobSchema, type Job } from "./schema";
 import { isJobVisible } from "./visibility";
 
 export type { Job } from "./schema";
-export { jobLocation } from "./schema";
+export { jobLocation, jobTitleTag } from "./schema";
 export { isJobVisible } from "./visibility";
 
 const JOBS_DIR = path.join(process.cwd(), "content", "jobs");

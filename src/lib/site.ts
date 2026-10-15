@@ -1,6 +1,19 @@
 import { publicEnv } from "@/lib/env";
 import { runtimeSettings } from "@/lib/settings";
 
+/** Career Reads' own profiles. A LinkedIn URL saved in admin Settings takes priority. */
+export const OFFICIAL_SOCIAL = {
+  linkedin: "https://www.linkedin.com/company/career-reads",
+  instagram: "https://www.instagram.com/careersreads/",
+} as const;
+
+export interface SocialProfiles {
+  linkedin: string;
+  instagram: string;
+  x: string;
+  github: string;
+}
+
 export const siteConfig = {
   name: "Career Reads",
   shortName: "Career Reads",
@@ -18,9 +31,15 @@ export const siteConfig = {
   pageSize: 6,
   /** ISR window for content pages, in seconds. */
   revalidateSeconds: 3600,
-  /** From admin Settings. Leave blank until real profiles exist — empty values are not rendered. */
-  get social(): { x: string; linkedin: string; github: string } {
-    return runtimeSettings().site?.social ?? { x: "", linkedin: "", github: "" };
+  /** Admin Settings where set, otherwise the official profiles. Empty values are not rendered. */
+  get social(): SocialProfiles {
+    const stored = runtimeSettings().site?.social;
+    return {
+      linkedin: stored?.linkedin || OFFICIAL_SOCIAL.linkedin,
+      instagram: OFFICIAL_SOCIAL.instagram,
+      x: stored?.x ?? "",
+      github: stored?.github ?? "",
+    };
   },
   nav: [
     { href: "/", label: "Home" },
