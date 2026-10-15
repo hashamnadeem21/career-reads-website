@@ -27,6 +27,6 @@ export default defineConfig({
     timeout: 240_000,
     // File-content mode: never call the local or production API
     // (the API and admin repos cover API mode against their own test database).
-    env: { NEXT_PUBLIC_SITE_URL: `http://localhost:${PORT}`, API_URL: "", SITE_API_KEY: "", REVALIDATE_SECRET: "" },
+    env: { NEXT_PUBLIC_SITE_URL: `http://localhost:${PORT}`, API_URL: "", SITE_API_KEY: "", REVALIDATE_SECRET: "", NEXT_PUBLIC_GOOGLE_CLIENT_ID: "" },
   },
 });

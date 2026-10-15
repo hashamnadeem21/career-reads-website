@@ -201,4 +201,27 @@ describe("the Google client ID", () => {
     expect(googleClientId()).toBe("123-abc.apps.googleusercontent.com");
     vi.unstubAllEnvs();
   });
+
+  it("falls back to the live site's client ID in production when neither variable is set, and an empty value turns it off", async () => {
+    vi.resetModules();
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("NEXT_PUBLIC_GOOGLE_CLIENT_ID", undefined);
+    vi.stubEnv("GOOGLE_CLIENT_ID", undefined);
+    const { googleClientId, PRODUCTION_GOOGLE_CLIENT_ID } = await import("@/lib/env");
+    expect(googleClientId()).toBe(PRODUCTION_GOOGLE_CLIENT_ID);
+    vi.stubEnv("NEXT_PUBLIC_GOOGLE_CLIENT_ID", "");
+    expect(googleClientId()).toBeUndefined();
+    vi.stubEnv("NEXT_PUBLIC_GOOGLE_CLIENT_ID", "123-abc.apps.googleusercontent.com");
+    expect(googleClientId()).toBe("123-abc.apps.googleusercontent.com");
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  it("has no fallback outside production", async () => {
+    vi.stubEnv("NEXT_PUBLIC_GOOGLE_CLIENT_ID", undefined);
+    vi.stubEnv("GOOGLE_CLIENT_ID", undefined);
+    const { googleClientId } = await import("@/lib/env");
+    expect(googleClientId()).toBeUndefined();
+    vi.unstubAllEnvs();
+  });
 });
