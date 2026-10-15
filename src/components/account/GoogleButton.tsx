@@ -51,9 +51,15 @@ function loadGoogle(): Promise<void> {
  * checks (signature, audience = our client ID, verified email) before signing the person in.
  * Hidden when no client ID is configured.
  */
-export function GoogleButton({ onCredential, text = "continue_with" }: { onCredential: (credential: string) => void; text?: "continue_with" | "signup_with" | "signin_with" }) {
-  // Read literally so Next inlines it (validated in lib/env.ts on the server).
-  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || undefined;
+export function GoogleButton({
+  clientId,
+  onCredential,
+  text = "continue_with",
+}: {
+  clientId?: string;
+  onCredential: (credential: string) => void;
+  text?: "continue_with" | "signup_with" | "signin_with";
+}) {
   const holder = useRef<HTMLDivElement>(null);
   const callback = useRef(onCredential);
   const { resolvedTheme } = useTheme();

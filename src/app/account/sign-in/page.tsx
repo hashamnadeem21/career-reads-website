@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AuthPanel } from "@/components/account/AuthPanel";
 import { currentCandidate } from "@/lib/candidate/session";
+import { googleClientId } from "@/lib/env";
 import { safeNext } from "@/lib/candidate/types";
 import { pageTitle } from "@/lib/seo";
 
@@ -25,7 +26,7 @@ export default async function SignInPage({ searchParams }: Props) {
         Apply for jobs on Career Reads in a few clicks. Reading articles and browsing jobs never needs an account.
       </p>
       <div className="mt-8 rounded-2xl border border-border bg-background p-5 sm:p-8">
-        <AuthPanel next={next} initialMode={mode === "signin" ? "signin" : "signup"} />
+        <AuthPanel next={next} initialMode={mode === "signin" ? "signin" : "signup"} googleClientId={googleClientId()} />
       </div>
     </div>
   );
