@@ -19,7 +19,8 @@ vi.mock("@/lib/candidate/session", () => ({
   storeSession: vi.fn(),
   visitor: async () => ({ ip: "203.0.113.9", userAgent: "test" }),
 }));
-vi.mock("next/navigation", () => ({ useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }) }));
+const nav = vi.hoisted(() => ({ pathname: "/account" }));
+vi.mock("next/navigation", () => ({ useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }), usePathname: () => nav.pathname }));
 vi.mock("next/link", () => ({
   default: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => (
     <a href={href} {...rest}>
@@ -32,6 +33,7 @@ const { submitApplication } = await import("@/app/jobs/[slug]/apply/actions");
 const { uploadCv } = await import("@/app/account/actions");
 const { MyApplications } = await import("@/components/account/MyApplications");
 const { ApplyForm } = await import("@/components/jobs/ApplyForm");
+const { AccountNav } = await import("@/components/account/AccountNav");
 
 const savedCv: SavedCv = { name: "Sara CV.pdf", contentType: "application/pdf", sizeBytes: 240_000, uploadedAt: "2026-10-12T09:00:00.000Z" };
 
@@ -165,5 +167,22 @@ describe("updating the saved CV", () => {
     expect(await uploadCv(null, data)).toMatchObject({ status: "success" });
     expect(api.send).toHaveBeenCalledWith("/public/candidate/cv", expect.objectContaining({ method: "POST", candidateSession: api.token }));
     expect((api.send.mock.calls[0][1].body as FormData).get("cv")).toBeInstanceOf(File);
+  });
+});
+
+describe("the account dashboard's tabs", () => {
+  it("marks the open tab and counts the applications", () => {
+    nav.pathname = "/account";
+    const { unmount } = render(<AccountNav applications={2} />);
+    expect(screen.getByRole("link", { name: /My applications/ })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: /My applications/ })).toHaveTextContent("2");
+    expect(screen.getByRole("link", { name: "My CV" })).not.toHaveAttribute("aria-current");
+    unmount();
+
+    nav.pathname = "/account/settings";
+    render(<AccountNav applications={0} />);
+    expect(screen.getByRole("link", { name: /Settings/ })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: /My applications/ })).not.toHaveAttribute("aria-current");
+    expect(screen.getByRole("link", { name: "My CV" })).toHaveAttribute("href", "/account/cv");
   });
 });

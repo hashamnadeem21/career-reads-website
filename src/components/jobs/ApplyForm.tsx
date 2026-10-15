@@ -394,7 +394,7 @@ export function ApplyForm({
                 </label>
               ))}
               {useSaved && (
-                <a href="/account/cv" target="_blank" rel="noopener" className="inline-block text-sm font-medium text-link hover:underline">
+                <a href="/account/cv/file" target="_blank" rel="noopener" className="inline-block text-sm font-medium text-link hover:underline">
                   View my saved CV
                 </a>
               )}

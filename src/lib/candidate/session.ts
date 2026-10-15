@@ -1,5 +1,6 @@
 import "server-only";
 import { cookies, headers } from "next/headers";
+import { cache } from "react";
 import { ApiRequestError, apiSend, hasApi } from "@/lib/api/client";
 import { isProduction } from "@/lib/env";
 import type { Candidate, MyApplications } from "./types";
@@ -48,7 +49,7 @@ export async function visitor() {
  * The signed-in candidate, or null (no cookie, expired session, or no API). A stale cookie is left
  * for the next Server Function to clear, since rendering can't change cookies.
  */
-export async function currentCandidate(): Promise<Candidate | null> {
+export const currentCandidate = cache(async (): Promise<Candidate | null> => {
   if (!hasApi()) return null;
   const token = await sessionToken();
   if (!token) return null;
@@ -59,10 +60,10 @@ export async function currentCandidate(): Promise<Candidate | null> {
     console.error("[account] couldn't load the signed-in candidate", error);
     return null;
   }
-}
+});
 
 /** Their applications (with the employer's status) and saved CV, or null when signed out or unavailable. */
-export async function myApplications(): Promise<MyApplications | null> {
+export const myApplications = cache(async (): Promise<MyApplications | null> => {
   if (!hasApi()) return null;
   const token = await sessionToken();
   if (!token) return null;
@@ -72,4 +73,4 @@ export async function myApplications(): Promise<MyApplications | null> {
     if (!(error instanceof ApiRequestError && error.status === 401)) console.error("[account] couldn't load applications", error);
     return null;
   }
-}
+});

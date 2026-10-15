@@ -59,11 +59,8 @@ export function MyCv({ cv }: { cv: SavedCv | null }) {
   const focusRing = "focus-within:ring-2 focus-within:ring-brand/40";
 
   return (
-    <section className="mt-8" aria-labelledby={`${id}-title`}>
-      <h2 id={`${id}-title`} className="flex items-center gap-2 text-xl font-semibold">
-        <FileText className="h-5 w-5 text-link" aria-hidden /> My CV
-      </h2>
-      <div className="mt-4 rounded-2xl border border-border bg-background p-4 sm:p-5">
+    <section aria-label="Your saved CV">
+      <div className="rounded-2xl border border-border bg-background p-4 sm:p-5">
         <form ref={formRef} action={upload} onSubmit={() => setNotice(null)}>
           {cv ? (
             <>
@@ -82,7 +79,7 @@ export function MyCv({ cv }: { cv: SavedCv | null }) {
               </div>
               <p className="mt-3 text-sm text-muted">We&apos;ll use this CV when you apply for a job. You can still choose a different one each time.</p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <a href="/account/cv" target="_blank" rel="noopener" className={button}>
+                <a href="/account/cv/file" target="_blank" rel="noopener" className={button}>
                   <Eye className="h-4 w-4" aria-hidden /> View
                 </a>
                 <label className={`${button} ${focusRing} cursor-pointer ${busy ? "pointer-events-none opacity-60" : ""}`}>

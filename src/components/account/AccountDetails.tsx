@@ -9,7 +9,7 @@ import type { AuthResult, Candidate } from "@/lib/candidate/types";
 import { announceAccountChange, inputClass, keepValues, thenOnSuccess } from "./AuthPanel";
 import { Avatar } from "./Avatar";
 
-const card = "mt-6 rounded-2xl border border-border bg-background p-5 sm:p-6";
+const card = "rounded-2xl border border-border bg-background p-5 sm:p-6";
 const smallButton =
   "inline-flex h-10 items-center gap-2 rounded-full border border-border px-4 text-sm font-semibold transition hover:bg-surface disabled:opacity-60";
 
@@ -48,7 +48,7 @@ export function AccountDetails({ candidate }: { candidate: Candidate }) {
   const spinner = (what: string) => pending && busy === what && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />;
 
   return (
-    <>
+    <div className="space-y-4">
       <section className={card} aria-label="Profile">
         <div className="flex items-center gap-4">
           <Avatar name={candidate.name} url={candidate.avatarUrl} size={56} />
@@ -111,7 +111,7 @@ export function AccountDetails({ candidate }: { candidate: Candidate }) {
       </section>
 
       <DeleteAccount />
-    </>
+    </div>
   );
 }
 
