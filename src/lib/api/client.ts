@@ -104,3 +104,16 @@ export async function apiSend<T>(
   if (response.status === 204) return null;
   return (await response.json()) as T;
 }
+
+/**
+ * A file from the API (a candidate's own CV), as the raw response so it can be streamed on.
+ * Returns null for a 404; throws ApiRequestError otherwise.
+ */
+export async function apiFile(path: string, options: Pick<CallOptions, "query" | "candidateSession">): Promise<Response | null> {
+  try {
+    return await call(path, options);
+  } catch (error) {
+    if (error instanceof ApiRequestError && error.status === 404) return null;
+    throw error;
+  }
+}

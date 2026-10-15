@@ -2,7 +2,7 @@ import "server-only";
 import { cookies, headers } from "next/headers";
 import { ApiRequestError, apiSend, hasApi } from "@/lib/api/client";
 import { isProduction } from "@/lib/env";
-import type { Candidate } from "./types";
+import type { Candidate, MyApplications } from "./types";
 
 /**
  * Candidate sign-in. The API issues an opaque session token; the site keeps it in an httpOnly
@@ -57,6 +57,19 @@ export async function currentCandidate(): Promise<Candidate | null> {
   } catch (error) {
     if (error instanceof ApiRequestError && error.status === 401) return null;
     console.error("[account] couldn't load the signed-in candidate", error);
+    return null;
+  }
+}
+
+/** Their applications (with the employer's status) and saved CV, or null when signed out or unavailable. */
+export async function myApplications(): Promise<MyApplications | null> {
+  if (!hasApi()) return null;
+  const token = await sessionToken();
+  if (!token) return null;
+  try {
+    return await apiSend<MyApplications>("/public/candidate/applications", { method: "GET", candidateSession: token });
+  } catch (error) {
+    if (!(error instanceof ApiRequestError && error.status === 401)) console.error("[account] couldn't load applications", error);
     return null;
   }
 }
