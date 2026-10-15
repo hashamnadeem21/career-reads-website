@@ -51,3 +51,6 @@ next-env.d.ts
 # Local admin uploads (production uses Vercel Blob)
 /public/uploads/
 /.next-itest/
+
+# Any extra Next build folder (test or check builds), so Tailwind never scans compiled output.
+/.next-*/

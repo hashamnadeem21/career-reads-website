@@ -15,6 +15,7 @@ const STATIC_PATHS = [
   "/trending",
   "/about",
   "/contact",
+  "/employers",
   "/editorial-policy",
   "/corrections-policy",
   "/privacy-policy",
