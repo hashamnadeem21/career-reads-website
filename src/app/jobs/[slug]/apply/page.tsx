@@ -7,6 +7,7 @@ import { ApplyForm } from "@/components/jobs/ApplyForm";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { apiGet, apiPath, hasApi } from "@/lib/api/client";
 import { currentCandidate } from "@/lib/candidate/session";
+import { googleClientId } from "@/lib/env";
 import { getJobBySlug, jobLocation } from "@/lib/jobs";
 import type { FormQuestion } from "@/lib/jobs/questions";
 import { pageTitle } from "@/lib/seo";
@@ -86,7 +87,7 @@ export default async function ApplyPage({ params }: Props) {
           <p className="mx-auto mt-2 mb-6 max-w-md text-center text-sm text-muted">
             A free Career Reads account takes a few seconds. You&apos;ll come straight back here to send your application.
           </p>
-          <AuthPanel next={`/jobs/${job.slug}/apply`} />
+          <AuthPanel next={`/jobs/${job.slug}/apply`} googleClientId={googleClientId()} />
         </section>
       )}
 

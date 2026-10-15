@@ -175,4 +175,30 @@ describe("the sign-in panel", () => {
     fireEvent.click(screen.getByRole("button", { name: "Forgot password?" }));
     expect(screen.getByTestId("forgot-form")).toBeInTheDocument();
   });
+  it("offers Google only when the page passes a client ID", async () => {
+    const { AuthPanel } = await import("@/components/account/AuthPanel");
+    const { unmount } = render(<AuthPanel next="/account" />);
+    expect(screen.queryByTestId("google-button")).not.toBeInTheDocument();
+    expect(screen.queryByText("or with email")).not.toBeInTheDocument();
+    unmount();
+    render(<AuthPanel next="/account" googleClientId="123-abc.apps.googleusercontent.com" />);
+    expect(screen.getByTestId("google-button")).toBeInTheDocument();
+    expect(screen.getByText("or with email")).toBeInTheDocument();
+  });
+});
+
+describe("the Google client ID", () => {
+  it("is read when the page is served, under either name, and ignores values that aren't client IDs", async () => {
+    const { googleClientId } = await import("@/lib/env");
+    vi.stubEnv("NEXT_PUBLIC_GOOGLE_CLIENT_ID", "");
+    vi.stubEnv("GOOGLE_CLIENT_ID", "");
+    expect(googleClientId()).toBeUndefined();
+    vi.stubEnv("GOOGLE_CLIENT_ID", "123-abc.apps.googleusercontent.com");
+    expect(googleClientId()).toBe("123-abc.apps.googleusercontent.com");
+    vi.stubEnv("NEXT_PUBLIC_GOOGLE_CLIENT_ID", " 456-def.apps.googleusercontent.com ");
+    expect(googleClientId()).toBe("456-def.apps.googleusercontent.com");
+    vi.stubEnv("NEXT_PUBLIC_GOOGLE_CLIENT_ID", "not-a-client-id");
+    expect(googleClientId()).toBe("123-abc.apps.googleusercontent.com");
+    vi.unstubAllEnvs();
+  });
 });

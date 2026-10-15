@@ -13,6 +13,14 @@ const emptyToUndefined = (value: unknown) =>
   typeof value === "string" && value.trim() === "" ? undefined : value;
 
 const optionalString = z.preprocess(emptyToUndefined, z.string().trim().optional());
+const googleClientIdSchema = z.preprocess(
+  emptyToUndefined,
+  z
+    .string()
+    .trim()
+    .regex(/\.apps\.googleusercontent\.com$/, "Google client IDs end with .apps.googleusercontent.com")
+    .optional(),
+);
 const booleanFlag = z.preprocess(
   emptyToUndefined,
   z
@@ -61,13 +69,7 @@ const publicSchema = z.object({
     z.email().default("contact@careersreads.com"),
   ),
   /** The OAuth client ID for "Sign in with Google" (public; the API checks tokens against the same ID). */
-  NEXT_PUBLIC_GOOGLE_CLIENT_ID: z.preprocess(
-    emptyToUndefined,
-    z
-      .string()
-      .regex(/\.apps\.googleusercontent\.com$/, "Google client IDs end with .apps.googleusercontent.com")
-      .optional(),
-  ),
+  NEXT_PUBLIC_GOOGLE_CLIENT_ID: googleClientIdSchema,
 });
 
 const parsedPublic = publicSchema.safeParse({
@@ -120,6 +122,13 @@ const serverSchema = z.object({
   SITE_API_KEY: optionalString,
   /** Shared secret the API sends to /api/revalidate after saves. */
   REVALIDATE_SECRET: z.preprocess(emptyToUndefined, z.string().min(16).optional()),
+  /**
+   * The Google client ID again, read when the page is served rather than baked in at build time: hosts
+   * that only hand environment variables to the running server (not to `next build`) still get the
+   * button. GOOGLE_CLIENT_ID (the API's name for it) works too.
+   */
+  NEXT_PUBLIC_GOOGLE_CLIENT_ID: optionalString,
+  GOOGLE_CLIENT_ID: optionalString,
 });
 
 export type ServerEnv = z.infer<typeof serverSchema>;
@@ -133,6 +142,16 @@ export function serverEnv(): ServerEnv {
     );
   }
   return parsed.data;
+}
+
+/**
+ * The client ID for "Sign in with Google", or undefined to offer email and password only. A value
+ * that isn't a Google client ID is ignored (the button would only fail), never a reason to fail the page.
+ */
+export function googleClientId(): string | undefined {
+  const env = serverEnv();
+  const candidates = [env.NEXT_PUBLIC_GOOGLE_CLIENT_ID, env.GOOGLE_CLIENT_ID, publicEnv.NEXT_PUBLIC_GOOGLE_CLIENT_ID];
+  return candidates.find((id) => googleClientIdSchema.safeParse(id).data);
 }
 
 /** Drafts are only ever rendered in local development with an explicit opt-in. */

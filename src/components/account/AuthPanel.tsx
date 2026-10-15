@@ -25,7 +25,16 @@ type Mode = "signup" | "signin" | "forgot";
  * Sign in or create an account: Google, or name + email + password. Used on the apply page (to
  * apply on Career Reads) and on /account/sign-in. After signing in it goes to `next`.
  */
-export function AuthPanel({ next, initialMode = "signup" }: { next: string; initialMode?: Mode }) {
+export function AuthPanel({
+  next,
+  initialMode = "signup",
+  googleClientId,
+}: {
+  next: string;
+  initialMode?: Mode;
+  /** From the server at request time (see googleClientId() in lib/env). Unset: email and password only. */
+  googleClientId?: string;
+}) {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>(initialMode);
   const [googleError, setGoogleError] = useState<string | null>(null);
@@ -67,7 +76,7 @@ export function AuthPanel({ next, initialMode = "signup" }: { next: string; init
             ))}
           </div>
           <div className="relative">
-            <GoogleButton onCredential={onGoogle} text={mode === "signup" ? "signup_with" : "signin_with"} />
+            <GoogleButton clientId={googleClientId} onCredential={onGoogle} text={mode === "signup" ? "signup_with" : "signin_with"} />
             {googlePending && (
               <p role="status" className="mt-2 flex items-center justify-center gap-2 text-sm text-muted">
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Signing you in…
@@ -79,7 +88,7 @@ export function AuthPanel({ next, initialMode = "signup" }: { next: string; init
               </p>
             )}
           </div>
-          {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
+          {googleClientId && (
             <p className="my-6 flex items-center gap-3 text-xs font-medium uppercase tracking-wide text-muted">
               <span className="h-px flex-1 bg-border" /> or with email <span className="h-px flex-1 bg-border" />
             </p>
