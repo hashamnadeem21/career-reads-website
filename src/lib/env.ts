@@ -32,6 +32,8 @@ const booleanFlag = z.preprocess(
 /** The live site's address and API. Production builds use them unless the variable is set. */
 export const PRODUCTION_SITE_URL = "https://www.careersreads.com";
 export const PRODUCTION_API_URL = "https://api.careersreads.com";
+/** "Sign in with Google" on the live site. Public by design: it is in every page that shows the button. */
+export const PRODUCTION_GOOGLE_CLIENT_ID = "655376341601-0kvto8nivch15o8lh9rml56uv1ndeevv.apps.googleusercontent.com";
 
 /**
  * True for `next build` / `next start` (on any host, not only Vercel). An unset variable falls back
@@ -147,10 +149,18 @@ export function serverEnv(): ServerEnv {
 /**
  * The client ID for "Sign in with Google", or undefined to offer email and password only. A value
  * that isn't a Google client ID is ignored (the button would only fail), never a reason to fail the page.
+ * Production falls back to PRODUCTION_GOOGLE_CLIENT_ID when neither variable is set (some hosts never
+ * pass them on); setting NEXT_PUBLIC_GOOGLE_CLIENT_ID to an empty string turns Google off.
  */
 export function googleClientId(): string | undefined {
   const env = serverEnv();
-  const candidates = [env.NEXT_PUBLIC_GOOGLE_CLIENT_ID, env.GOOGLE_CLIENT_ID, publicEnv.NEXT_PUBLIC_GOOGLE_CLIENT_ID];
+  const unset = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID === undefined && process.env.GOOGLE_CLIENT_ID === undefined;
+  const candidates = [
+    env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+    env.GOOGLE_CLIENT_ID,
+    publicEnv.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+    unset && isProduction ? PRODUCTION_GOOGLE_CLIENT_ID : undefined,
+  ];
   return candidates.find((id) => googleClientIdSchema.safeParse(id).data);
 }
 
