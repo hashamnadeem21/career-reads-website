@@ -27,6 +27,7 @@ export const siteConfig = {
     { href: "/jobs", label: "Jobs" },
     { href: "/blog", label: "Blog" },
     { href: "/trending", label: "Trending" },
+    { href: "/employers", label: "For employers" },
     { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },
   ],
@@ -39,6 +40,7 @@ export const siteConfig = {
     ],
     company: [
       { href: "/about", label: "About" },
+      { href: "/employers", label: "For employers" },
       { href: "/contact", label: "Contact" },
       { href: "/editorial-policy", label: "Editorial policy" },
       { href: "/corrections-policy", label: "Corrections policy" },
